@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Informasi Manajemen Siswa Baru LPK IJEF CORP",
+  "description": "Sistem Informasi Manajemen LPK IJEF Corp - Portal Siswa, Portal Mitra LPK, Portal Marketing & CRM Akuisisi Siswa Baru (Dashboard Analitik, Pipeline Kanban, Intake Form, Master Data, Follow-Up WhatsApp, Tim Leaderboard, Kampanye & Event, Pengaturan Sistem), serta Back-Office Admin Siswa (SIM-SB) & Admin Doc (CV Portal & Matching JIS).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

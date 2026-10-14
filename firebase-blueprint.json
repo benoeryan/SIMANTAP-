@@ -1,0 +1,222 @@
+{
+  "entities": {
+    "CalonSiswa": {
+      "title": "Calon Siswa",
+      "description": "Data pendaftaran calon siswa LPK IJEF CORP",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "namaLengkap": { "type": "string" },
+        "noHp": { "type": "string" },
+        "email": { "type": "string" },
+        "kewarganegaraan": { "type": "string" },
+        "noKtp": { "type": "string" },
+        "noKk": { "type": "string" },
+        "alamatDomisili": { "type": "string" },
+        "tempatLahir": { "type": "string" },
+        "tanggalLahir": { "type": "string" },
+        "agama": { "type": "string" },
+        "jenisKelamin": { "type": "string" },
+        "golonganDarah": { "type": "string" },
+        "statusPerkawinan": { "type": "string" },
+        "namaAyah": { "type": "string" },
+        "pekerjaanAyah": { "type": "string" },
+        "ktpNpwpAyah": { "type": "string" },
+        "namaIbu": { "type": "string" },
+        "pekerjaanIbu": { "type": "string" },
+        "ktpNpwpIbu": { "type": "string" },
+        "berkasDokumen": { "type": "object" },
+        "statusPendaftaran": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["namaLengkap", "noHp", "email", "noKtp"]
+    },
+    "HasilKesehatan": {
+      "title": "Hasil Kesehatan",
+      "description": "Screening dan evaluasi medis calon siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "siswaId": { "type": "string" },
+        "namaSiswa": { "type": "string" },
+        "riwayatPenyakitSerius": { "type": "string" },
+        "pengobatanRutin": { "type": "string" },
+        "riwayatOperasi": { "type": "string" },
+        "riwayatTbc": { "type": "string" },
+        "riwayatHepatitis": { "type": "string" },
+        "penyakitAsma": { "type": "string" },
+        "penyakitOrganDalam": { "type": "string" },
+        "kecelakaanParah": { "type": "string" },
+        "perokokAktif": { "type": "string" },
+        "pecanduAlkohol": { "type": "string" },
+        "obatObatanTerlarang": { "type": "string" },
+        "gangguanJiwaStress": { "type": "string" },
+        "masalahTulangSendi": { "type": "string" },
+        "kepemilikanTato": { "type": "string" },
+        "statusFit": { "type": "string" },
+        "catatanDokter": { "type": "string" },
+        "evaluatorName": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["siswaId", "statusFit"]
+    },
+    "AsesmenDisc": {
+      "title": "Asesmen DISC",
+      "description": "Hasil tes kepribadian DISC calon siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "siswaId": { "type": "string" },
+        "namaSiswa": { "type": "string" },
+        "scoreD": { "type": "number" },
+        "scoreI": { "type": "number" },
+        "scoreS": { "type": "number" },
+        "scoreC": { "type": "number" },
+        "dominantType": { "type": "string" },
+        "answers": { "type": "object" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["siswaId", "dominantType"]
+    },
+    "AsesmenPsikotes": {
+      "title": "Asesmen Psikotes",
+      "description": "Hasil tes logika & kognitif 50 soal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "siswaId": { "type": "string" },
+        "namaSiswa": { "type": "string" },
+        "totalCorrect": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "scorePercentage": { "type": "number" },
+        "statusKelulusan": { "type": "string" },
+        "userAnswers": { "type": "object" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["siswaId", "totalCorrect"]
+    },
+    "AplikasiDukunganDana": {
+      "title": "Aplikasi Dukungan Dana",
+      "description": "Form dan simulasi pembiayaan pelatihan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "siswaId": { "type": "string" },
+        "namaSiswa": { "type": "string" },
+        "namaPenjamin": { "type": "string" },
+        "ktpPenjamin": { "type": "string" },
+        "npwpPenjamin": { "type": "string" },
+        "pekerjaanPenjamin": { "type": "string" },
+        "programOption": { "type": "string" },
+        "biayaTotal": { "type": "number" },
+        "plafondPinjaman": { "type": "number" },
+        "tenorBulan": { "type": "number" },
+        "angsuranPerBulan": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["siswaId", "namaPenjamin", "programOption"]
+    },
+    "SuratPerjanjian": {
+      "title": "Surat Perjanjian",
+      "description": "Kontrak keikutsertaan pelatihan & penyaluran kerja",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "siswaId": { "type": "string" },
+        "nomorSurat": { "type": "string" },
+        "tanggalSurat": { "type": "string" },
+        "pihakPertama": { "type": "string" },
+        "pihakKeduaNama": { "type": "string" },
+        "statusPersetujuan": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["siswaId", "nomorSurat"]
+    },
+    "MitraOrganization": {
+      "title": "Mitra Organization",
+      "description": "Data direktori lembaga mitra LPK, Kumiai, TSK, dan SMK terdaftar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "picName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "category": { "type": "string" },
+        "wilayah": { "type": "string" },
+        "status": { "type": "string" },
+        "passwordHint": { "type": "string" }
+      },
+      "required": ["name", "email"]
+    },
+    "AdminUser": {
+      "title": "Admin User",
+      "description": "Akun admin, super admin, staf penempatan, dan tim marketing LPK IJEF CORP",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "portalAccess": { "type": "string" },
+        "department": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "JobPosting": {
+      "title": "Job Posting",
+      "description": "Listingan lowongan kerja Tokutei Ginou dan SSW Jepang",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "kodeJob": { "type": "string" },
+        "judulPekerjaan": { "type": "string" },
+        "perusahaanJepang": { "type": "string" },
+        "lokasiPrefektur": { "type": "string" },
+        "gajiBulananYen": { "type": "number" },
+        "statusJob": { "type": "string" }
+      },
+      "required": ["judulPekerjaan", "perusahaanJepang"]
+    }
+  },
+  "firestore": {
+    "/calon_siswa/{id}": {
+      "schema": { "$ref": "#/entities/CalonSiswa" },
+      "description": "Koleksi data calon siswa"
+    },
+    "/hasil_kesehatan/{id}": {
+      "schema": { "$ref": "#/entities/HasilKesehatan" },
+      "description": "Koleksi hasil skrining medis"
+    },
+    "/asesmen_disc/{id}": {
+      "schema": { "$ref": "#/entities/AsesmenDisc" },
+      "description": "Koleksi hasil tes DISC"
+    },
+    "/asesmen_psikotes/{id}": {
+      "schema": { "$ref": "#/entities/AsesmenPsikotes" },
+      "description": "Koleksi hasil psikotes 50 soal"
+    },
+    "/dukungan_dana/{id}": {
+      "schema": { "$ref": "#/entities/AplikasiDukunganDana" },
+      "description": "Koleksi aplikasi pembiayaan"
+    },
+    "/surat_perjanjian/{id}": {
+      "schema": { "$ref": "#/entities/SuratPerjanjian" },
+      "description": "Koleksi dokumen perjanjian keikutsertaan"
+    },
+    "/mitra_organizations/{id}": {
+      "schema": { "$ref": "#/entities/MitraOrganization" },
+      "description": "Koleksi data mitra resmi terdaftar"
+    },
+    "/admin_users/{id}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Koleksi akun admin dan marketing"
+    },
+    "/lowongan_kerja/{id}": {
+      "schema": { "$ref": "#/entities/JobPosting" },
+      "description": "Koleksi lowongan kerja Jepang"
+    }
+  }
+}
+
