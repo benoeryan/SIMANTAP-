@@ -63,7 +63,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3217084506720004',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Rirekisho_Bagus_Adi_Saputra.pdf',
         ijazah: 'Ijazah_SMKN_4_Padalarang_RPL_Bagus.pdf',
         skck: 'SKCK_Polres_Cimahi_Bagus.pdf',
@@ -162,7 +162,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Saya alumni siswa offline LPK IJEF CORP Padalarang lulusan SMKN 4 Padalarang jurusan RPL. Telah lulus JFT-Basic A2 (Skor 243/250), SSW Kaigo Keperawatan (Bahasa 93%, Skill 87%), dan SSW OTAFF Restoran. Siap bekerja keras, disiplin, dan memberikan pelayanan terbaik di Jepang.',
       prKeunggulanDiri: 'Disiplin tinggi, menguasai IT/RPL, kondisi fisik fit, pekerja keras, ramah, serta memiliki 2 sertifikat keahlian Tokutei Ginou (Kaigo Keperawatan & Food Service).',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-08-01T00:00:00Z'
     },
     health: {
@@ -256,7 +256,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3201014506720011',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Rizky_Putra_Wardhana_JIS.pdf',
         ijazah: 'Ijazah_SMK_Teknik_Rizky.pdf',
         skck: 'SKCK_Polres_Bandung_Rizky.pdf',
@@ -313,7 +313,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Saya bercita-cita bekerja di Jepang sebagai tenaga ahli Tokutei Ginou Kaigo. Lulusan Batch 10-A LPK IJEF CORP dengan sertifikasi JFT-Basic A2 dan SSW Kaigo.',
       prKeunggulanDiri: 'Fisik kuat, sangat disiplin, bertanggung jawab, ramah, dan mematuhi etika kerja Jepang.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: {
@@ -349,7 +349,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Guru',
       ktpNpwpIbu: '3201024506720022',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Melani_Citra_JIS.pdf',
         ijazah: 'Ijazah_D3_Keperawatan_Melani.pdf',
         skck: 'SKCK_Polres_Bogor.pdf',
@@ -404,7 +404,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Ingin mengabdi sebagai Kaigo profesional di panti jompo Jepang. Siap bekerja keras.',
       prKeunggulanDiri: 'Sabar, santun, komunikatif bahasa Jepang teruji N3.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B10A-002', siswaId: 'SISWA-IJEF-B10A-002', namaSiswa: 'Melani Citra Lestari', statusFit: 'FIT', tinggiBadan: 161, beratBadan: 53, tekananDarah: '115/75', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-10T08:00:00Z' },
@@ -439,7 +439,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Karyawan Swasta',
       ktpNpwpIbu: '3202025509680022',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Anisa_Melani_JIS.pdf',
         ijazah: 'Ijazah_S1_Keperawatan_Anisa.pdf',
         skck: 'SKCK_Polres_Serang_Anisa.pdf',
@@ -494,7 +494,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Sebagai lulusan S1 Keperawatan dan alumni LPK IJEF CORP Batch 10B yang telah lulus JFT-Basic A2 & SSW Kaigo.',
       prKeunggulanDiri: 'Sabar, teliti, berempati tinggi, terbiasa menangani pasien lansia.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B10B-001', siswaId: 'SISWA-IJEF-B10B-001', namaSiswa: 'Anisa Melani Putri', statusFit: 'FIT', tinggiBadan: 160, beratBadan: 52, tekananDarah: '115/75', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-15T08:00:00Z' },
@@ -529,7 +529,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3302014506720033',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Fajar_Kurniawan_JIS.pdf',
         ijazah: 'Ijazah_SMK_Pertanian_Fajar.pdf',
         skck: 'SKCK_Polres_Banyumas_Fajar.pdf',
@@ -584,7 +584,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Memiliki latar belakang SMK Pertanian & kelulusan JFT-Basic A2 serta SSW Pertanian di Batch 9 LPK IJEF CORP.',
       prKeunggulanDiri: 'Fisik kuat, disiplin, pekerja keras.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B9-001', siswaId: 'SISWA-IJEF-B9-001', namaSiswa: 'Fajar Kurniawan Sasmita', statusFit: 'FIT', tinggiBadan: 175, beratBadan: 68, tekananDarah: '122/82', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sangat sehat, stamina fisik di atas rata-rata.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-12T08:00:00Z' },
@@ -619,7 +619,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Guru Sekolah',
       ktpNpwpIbu: '3503014506720044',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Hendrikus_Setiawan_JIS.pdf',
         ijazah: 'Ijazah_D3_Teknik_Mesin_Hendrikus.pdf',
         skck: 'SKCK_Polrestabes_Surabaya.pdf',
@@ -674,7 +674,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Lulusan D3 Teknik Mesin dan alumni LPK IJEF CORP Batch 8. Tersertifikasi JFT-Basic A2, SSW Pengolahan Makanan, dan SSW Manufaktur.',
       prKeunggulanDiri: 'Disiplin, teliti, paham standar HACCP.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B8-001', siswaId: 'SISWA-IJEF-B8-001', namaSiswa: 'Hendrikus Setiawan', statusFit: 'FIT', tinggiBadan: 170, beratBadan: 64, tekananDarah: '118/78', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'MCU lengkap sehat sempurna.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-18T08:00:00Z' },
@@ -709,7 +709,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3273014506720055',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Dewi_Anggraini_JIS.pdf',
         ijazah: 'Ijazah_D3_Perhotelan_Dewi.pdf',
         skck: 'SKCK_Polresta_Yogyakarta.pdf',
@@ -764,7 +764,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Lulusan D3 Perhotelan alumni LPK IJEF CORP Batch 7 dengan sertifikat resmi JFT-Basic A2, JLPT N3, dan SSW Akomodasi.',
       prKeunggulanDiri: 'Sopan santun tinggi, paras ramah, bahasa Jepang fasih.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B7-001', siswaId: 'SISWA-IJEF-B7-001', namaSiswa: 'Dewi Anggraini Setyowati', statusFit: 'FIT', tinggiBadan: 162, beratBadan: 54, tekananDarah: '115/75', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Postur ideal, sehat dan bugar.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-19T08:00:00Z' },
@@ -799,7 +799,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3321014506720066',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Bagus_Tri_Prasetyo.pdf',
         ijazah: 'Ijazah_SMK_Otomotif.pdf',
         skck: 'SKCK_Demak.pdf',
@@ -854,7 +854,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Lulusan SMK Otomotif & LPK IJEF CORP Batch 6, siap bekerja di sektor Konstruksi / Manufaktur Jepang.',
       prKeunggulanDiri: 'Fisik kuat, mekanik handal, pekerja keras.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B6-001', siswaId: 'SISWA-IJEF-B6-001', namaSiswa: 'Bagus Tri Prasetyo', statusFit: 'FIT', tinggiBadan: 173, beratBadan: 66, tekananDarah: '120/80', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-10T08:00:00Z' },
@@ -889,7 +889,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3171014506720055',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Siti_Nurhaliza.pdf',
         ijazah: 'Ijazah_S1_Sastra_Jepang.pdf',
         skck: 'SKCK_Polres_Tebe.pdf',
@@ -944,7 +944,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Lulusan S1 Sastra Jepang & JLPT N2, alumni LPK IJEF Batch 5. Siap menjadi Kaigo leader di Jepang.',
       prKeunggulanDiri: 'Bahasa Jepang sangat lancar (N2), pemahaman budaya tinggi.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B5-001', siswaId: 'SISWA-IJEF-B5-001', namaSiswa: 'Siti Nurhaliza Aulia', statusFit: 'FIT', tinggiBadan: 159, beratBadan: 50, tekananDarah: '110/70', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat prima.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-08T08:00:00Z' },
@@ -979,7 +979,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Guru',
       ktpNpwpIbu: '3374014506720044',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Aditya_Wahyu.pdf',
         ijazah: 'Ijazah_SMK_Listrik.pdf',
         skck: 'SKCK_Polresta_Semarang.pdf',
@@ -1034,7 +1034,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Teknisi listrik berpengalaman & alumni LPK IJEF CORP Batch 4. Siap bekerja di industri kelistrikan Jepang.',
       prKeunggulanDiri: 'Faham diagram listrik, sangat teliti, berdedikasi.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B4-001', siswaId: 'SISWA-IJEF-B4-001', namaSiswa: 'Aditya Wahyu Nugroho', statusFit: 'FIT', tinggiBadan: 171, beratBadan: 63, tekananDarah: '120/80', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-02T08:00:00Z' },
@@ -1069,7 +1069,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3275014506720033',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Nadia_Rahmawati.pdf',
         ijazah: 'Ijazah_SMK_Tata_Boga.pdf',
         skck: 'SKCK_Polres_Bekasi.pdf',
@@ -1124,7 +1124,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Lulusan Tata Boga & LPK IJEF Batch 3. Memiliki keahlian pembuatan roti/makanan olahan dengan higienitas tinggi.',
       prKeunggulanDiri: 'Sangat bersih, cepat, terbiasa dengan standar sanitasi dapur pabrik.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B3-001', siswaId: 'SISWA-IJEF-B3-001', namaSiswa: 'Nadia Rahmawati Fitri', statusFit: 'FIT', tinggiBadan: 160, beratBadan: 51, tekananDarah: '115/75', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-06-15T08:00:00Z' },
@@ -1159,7 +1159,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3515014506720022',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Aris_Maulana.pdf',
         ijazah: 'Ijazah_SMK_Las.pdf',
         skck: 'SKCK_Sidoarjo.pdf',
@@ -1214,7 +1214,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Juru las berpengalaman 6 tahun & alumni LPK IJEF CORP Batch 2. Siap berkontribusi di industri galangan & konstruksi Jepang.',
       prKeunggulanDiri: 'Fisik sangat tangguh, welder berpengalaman, tahan panas kerja.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B2-001', siswaId: 'SISWA-IJEF-B2-001', namaSiswa: 'Aris Maulana Yusuf', statusFit: 'FIT', tinggiBadan: 174, beratBadan: 67, tekananDarah: '122/82', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat perkasa.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-05-01T08:00:00Z' },
@@ -1249,7 +1249,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3301014506720011',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Tri_Wahyudi.pdf',
         ijazah: 'Ijazah_SMK_Mesin.pdf',
         skck: 'SKCK_Cilacap.pdf',
@@ -1304,7 +1304,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Kandidat Senior alumni Batch 1B LPK IJEF CORP. Siap ditempatkan di bidang Pertanian/Pengolahan Makanan Jepang.',
       prKeunggulanDiri: 'Sangat berpengalaman, disiplin, berjiwa pemimpin.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-B1B-001', siswaId: 'SISWA-IJEF-B1B-001', namaSiswa: 'Tri Wahyudi Pangestu', statusFit: 'FIT', tinggiBadan: 172, beratBadan: 65, tekananDarah: '120/80', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat prima.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-03-25T08:00:00Z' },
@@ -1329,7 +1329,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       tempatLahir: 'Depok',
       tanggalLahir: '1992-05-10',
       agama: 'Islam',
-      jenisKelamin: 'Laki-laki',
+      jenisKelamin: 'Perempuan',
       golonganDarah: 'O',
       statusPerkawinan: 'Lajang',
       namaAyah: 'Triyono',
@@ -1339,7 +1339,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       pekerjaanIbu: 'Ibu Rumah Tangga',
       ktpNpwpIbu: '3201014506720011',
       berkasDokumen: {
-        pasFoto: '',
+        pasFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
         cv: 'CV_Bambang_Emergency.pdf',
         ijazah: 'Ijazah_SMK_Mesin.pdf',
         skck: 'SKCK_Depok.pdf',
@@ -1362,7 +1362,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       kategoriKandidat: 'SISWA IJEF - Offline',
       tempatTanggalLahir: 'Depok, 10 Mei 1992',
       umur: 34,
-      jenisKelamin: 'Laki-laki',
+      jenisKelamin: 'Perempuan',
       statusPernikahan: 'Lajang',
       alamatLengkap: 'Jl. Raya Bogor Km 30, Depok, Jawa Barat',
       agama: 'Islam',
@@ -1394,7 +1394,7 @@ export const DRIVE_GRADUATES_LIST: DriveGraduateRecord[] = [
       shidouDoki: 'Kandidat Jalur Siaga Emergency Fast-Track LPK IJEF CORP. Memiliki pengalaman kerja 10 tahun & siap terbang kapan saja ke Jepang.',
       prKeunggulanDiri: 'Sangat sigap, mental baja, siap ditempatkan segera.',
       statusCV: 'Siap Matching',
-      pasFotoUrl: '',
+      pasFotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
       updatedAt: '2026-07-31T00:00:00Z'
     },
     health: { id: 'mcu-EMG-001', siswaId: 'SISWA-IJEF-EMG-001', namaSiswa: 'Bambang Triyono', statusFit: 'FIT', tinggiBadan: 175, beratBadan: 68, tekananDarah: '120/80', butaWarna: 'Normal', riwayatPenyakitSerius: 'Tidak Ada', pengobatanRutin: 'Tidak Ada', riwayatOperasi: 'Tidak Ada', riwayatTbc: 'Tidak Ada', riwayatHepatitis: 'Tidak Ada', penyakitAsma: 'Tidak Ada', penyakitOrganDalam: 'Tidak Ada', kecelakaanParah: 'Tidak Ada', perokokAktif: 'Tidak', pecanduAlkohol: 'Tidak', obatObatanTerlarang: 'Tidak', gangguanJiwaStress: 'Tidak', masalahTulangSendi: 'Tidak', kepemilikanTato: 'Tidak', catatanDokter: 'Sehat jasmani dan rohani, MCU Emergency LULUS.', evaluatorName: 'Dr. Hendra Wijaya, Sp.Ok', updatedAt: '2026-07-25T08:00:00Z' },

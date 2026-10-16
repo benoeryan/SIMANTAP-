@@ -28,7 +28,7 @@ import {
   INITIAL_MITRA_ORGANIZATIONS
 } from '../data/seedData';
 import { DRIVE_GRADUATES_LIST } from '../data/googleDriveGraduatesData';
-import { parseBackupCandidates, parseCandidateFromFirestore } from '../utils/firestoreBackupParser';
+import { parseBackupCandidates, parseCandidateFromFirestore, extractNormalizedGender, extractPhotoUrl } from '../utils/firestoreBackupParser';
 import {
   fetchCandidatesFromFirestore,
   fetchStudentsFromFirestore,
@@ -577,8 +577,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         studRes.data.forEach((s: any) => {
           if (!s || !s.id) return;
           const existing = baseMap.get(s.id);
-          const sPhoto = s.berkasDokumen?.pasFoto || s.berkasDokumen?.pasPhoto || s.pasPhoto || s.pasFotoUrl || existing?.pasPhoto || '';
-          const sGender = s.jenisKelamin || s.gender || s.sex || s.kelamin || existing?.jenisKelamin || 'Laki-laki';
+          const sPhoto = extractPhotoUrl(s) || existing?.pasPhoto || '';
+          const sGender = extractNormalizedGender(s) || extractNormalizedGender(existing);
           baseMap.set(s.id, {
             ...(existing || {}),
             ...s,
@@ -600,7 +600,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const cEmail = (c.email || '').trim().toLowerCase();
           const cKtp = (c.noKtp || c.nik || '').trim();
           const cName = (c.namaLengkap || '').trim().toLowerCase();
-          const cGender = c.jenisKelamin || c.gender || c.sex || c.kelamin;
+          const cGender = extractNormalizedGender(c);
 
           let foundKey: string | null = null;
           for (const [k, item] of baseMap.entries()) {
@@ -610,14 +610,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (cName && cName !== '-' && cName !== 'kandidat firebase' && item.namaLengkap && item.namaLengkap.trim().toLowerCase() === cName) { foundKey = k; break; }
           }
 
-          const photoUrl = c.pasPhoto || c.pasFoto || c.pasFotoUrl || c.fotoUrl || c.photoUrl || c.berkasDokumen?.pasFoto || '';
+          const photoUrl = extractPhotoUrl(c);
           if (foundKey) {
             const existing = baseMap.get(foundKey)!;
             const resolvedPhoto = photoUrl || existing.berkasDokumen?.pasFoto || existing.pasPhoto || '';
             baseMap.set(foundKey, {
               ...existing,
               namaLengkap: c.namaLengkap || existing.namaLengkap,
-              jenisKelamin: cGender || existing.jenisKelamin || 'Laki-laki',
+              jenisKelamin: cGender || existing.jenisKelamin,
               noKtp: c.noKtp || c.nik || existing.noKtp,
               alamatDomisili: c.alamatDomisili || c.alamat || existing.alamatDomisili,
               email: c.email || existing.email,
@@ -635,7 +635,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               namaLengkap: c.namaLengkap || 'Kandidat Firebase',
               email: c.email || '',
               noHp: c.noHp || '',
-              jenisKelamin: cGender || 'Laki-laki',
+              jenisKelamin: cGender,
               noKtp: c.noKtp || c.nik || '',
               alamatDomisili: c.alamatDomisili || c.alamat || '',
               kategoriKandidat: c.kategoriKandidat || 'SISWA NON IJEF (New Comer)',

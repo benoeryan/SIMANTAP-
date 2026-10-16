@@ -52,6 +52,49 @@ export function mapCategory(rawCat?: any): CandidateCategory {
   return 'SISWA NON IJEF (New Comer)';
 }
 
+export function extractPhotoUrl(raw: any): string {
+  if (!raw || typeof raw !== 'object') return '';
+  const berkas = raw.berkasDokumen || {};
+  const dok = raw.dokumenUpload || {};
+  const list = [
+    raw.pasPhoto,
+    raw.pasFoto,
+    raw.pasFotoUrl,
+    raw.fotoUrl,
+    raw.photoUrl,
+    berkas.pasFoto,
+    berkas.pasPhoto,
+    dok.pasPhoto,
+    dok.pasFoto,
+    dok.pasPhoto3x4
+  ];
+  for (const item of list) {
+    if (typeof item === 'string' && item.trim().length > 5) {
+      return item.trim();
+    }
+  }
+  return '';
+}
+
+export function extractNormalizedGender(raw: any): 'Laki-laki' | 'Perempuan' {
+  if (!raw) return 'Laki-laki';
+  const val = typeof raw === 'string'
+    ? raw
+    : (raw.jenisKelamin || raw.gender || raw.sex || raw.kelamin || '');
+  const str = String(val).trim().toLowerCase();
+  if (
+    str.includes('perempuan') ||
+    str.includes('wanita') ||
+    str.includes('female') ||
+    str.includes('女性') ||
+    str.includes('女') ||
+    str === 'p'
+  ) {
+    return 'Perempuan';
+  }
+  return 'Laki-laki';
+}
+
 export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRirekisho>; calonSiswaList: CalonSiswa[] } {
   const rirekishoMap: Record<string, CVRirekisho> = {};
   const calonSiswaList: CalonSiswa[] = [];
@@ -66,9 +109,13 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
 
     const raw = item.fields ? unwrapFirestoreValue(item.fields) : item;
     const category = mapCategory(raw.kategoriKandidat);
-    const rawNameStr = typeof raw.namaLengkap === 'string' ? raw.namaLengkap : (raw.namaLengkap ? String(raw.namaLengkap) : 'Tanpa Nama');
+    let rawNameStr = typeof raw.namaLengkap === 'string' ? raw.namaLengkap : (typeof raw.nama === 'string' ? raw.nama : '');
+    if (rawNameStr === '[object Object]' || !rawNameStr.trim()) {
+      rawNameStr = typeof raw.namaPanggilan === 'string' && raw.namaPanggilan.trim() ? raw.namaPanggilan : (raw.email ? raw.email.split('@')[0] : `Kandidat-${id.substring(0, 6)}`);
+    }
     const namaLengkap = rawNameStr.trim() || 'Tanpa Nama';
-    const photoUrl = typeof raw.pasPhoto === 'string' ? raw.pasPhoto : (typeof raw.pasFoto === 'string' ? raw.pasFoto : (typeof raw.pasFotoUrl === 'string' ? raw.pasFotoUrl : (raw.berkasDokumen?.pasFoto || '')));
+    const photoUrl = extractPhotoUrl(raw);
+    const gender = extractNormalizedGender(raw);
 
     // Map family list if present
     const dataKeluarga = Array.isArray(raw.keluarga)
@@ -121,7 +168,7 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
       tempatTanggalLahir: raw.tempatLahir && raw.tanggalLahir ? `${raw.tempatLahir}, ${raw.tanggalLahir}` : '',
       umur: calculateAgeFromBirthDate(typeof raw.tanggalLahir === 'string' ? raw.tanggalLahir : '', typeof raw.umur === 'number' ? raw.umur : 22),
       alamatLengkap: typeof raw.alamatLengkap === 'string' ? raw.alamatLengkap : '',
-      jenisKelamin: raw.jenisKelamin === 'PEREMPUAN' ? 'Perempuan' : 'Laki-laki',
+      jenisKelamin: gender,
       agama: typeof raw.agama === 'string' ? raw.agama : '',
       golonganDarah: typeof raw.golonganDarah === 'string' ? raw.golonganDarah : '',
       tinggiBadan: typeof raw.tinggiBadan === 'string' ? String(raw.tinggiBadan) : '',
@@ -196,7 +243,7 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
       tanggalLahir: typeof raw.tanggalLahir === 'string' ? raw.tanggalLahir : '',
       umur: calculateAgeFromBirthDate(typeof raw.tanggalLahir === 'string' ? raw.tanggalLahir : '', typeof raw.umur === 'number' ? raw.umur : 22),
       agama: (typeof raw.agama === 'string' && raw.agama ? raw.agama : 'Islam') as any,
-      jenisKelamin: raw.jenisKelamin === 'PEREMPUAN' ? 'Perempuan' : 'Laki-laki',
+      jenisKelamin: gender,
       golonganDarah: (typeof raw.golonganDarah === 'string' && raw.golonganDarah ? raw.golonganDarah : 'O') as any,
       statusPerkawinan: raw.statusPernikahan === 'SUDAH MENIKAH' ? 'Menikah' : 'Lajang',
       namaAyah: '',
@@ -361,7 +408,7 @@ export function parseCandidateFromFirestore(id: string, rawDocData: any): CVRire
     tempatTanggalLahir: raw.tempatTanggalLahir || (raw.tempatLahir && raw.tanggalLahir ? `${raw.tempatLahir}, ${raw.tanggalLahir}` : ''),
     umur: calculateAgeFromBirthDate(typeof raw.tanggalLahir === 'string' ? raw.tanggalLahir : '', typeof raw.umur === 'number' ? raw.umur : 22),
     alamatLengkap: typeof raw.alamatLengkap === 'string' ? raw.alamatLengkap : '',
-    jenisKelamin: raw.jenisKelamin === 'PEREMPUAN' || raw.jenisKelamin === 'Perempuan' ? 'Perempuan' : 'Laki-laki',
+    jenisKelamin: extractNormalizedGender(raw),
     agama: typeof raw.agama === 'string' ? raw.agama : '',
     golonganDarah: typeof raw.golonganDarah === 'string' ? raw.golonganDarah : '',
     tinggiBadan: raw.tinggiBadan ? String(raw.tinggiBadan) : '',
@@ -398,9 +445,9 @@ export function parseCandidateFromFirestore(id: string, rawDocData: any): CVRire
     coeTerbit: typeof raw.coeTerbit === 'string' ? raw.coeTerbit : '',
     namaPerusahaanJp: typeof raw.namaPerusahaanJp === 'string' ? raw.namaPerusahaanJp : (typeof raw.namaPerusahaanProgres === 'string' ? raw.namaPerusahaanProgres : ''),
     lokasiPerusahaanJp: typeof raw.lokasiPerusahaanJp === 'string' ? raw.lokasiPerusahaanJp : (typeof raw.lokasiPerusahaan === 'string' ? raw.lokasiPerusahaan : ''),
-    pasFotoUrl: typeof raw.pasFotoUrl === 'string' ? raw.pasFotoUrl : (typeof raw.pasPhoto === 'string' ? raw.pasPhoto : (typeof raw.pasFoto === 'string' ? raw.pasFoto : (raw.berkasDokumen?.pasFoto || ''))),
-    pasPhoto: typeof raw.pasPhoto === 'string' ? raw.pasPhoto : (typeof raw.pasFotoUrl === 'string' ? raw.pasFotoUrl : (typeof raw.pasFoto === 'string' ? raw.pasFoto : (raw.berkasDokumen?.pasFoto || ''))),
-    pasFoto: typeof raw.pasFoto === 'string' ? raw.pasFoto : (typeof raw.pasPhoto === 'string' ? raw.pasPhoto : (typeof raw.pasFotoUrl === 'string' ? raw.pasFotoUrl : (raw.berkasDokumen?.pasFoto || ''))),
+    pasFotoUrl: extractPhotoUrl(raw),
+    pasPhoto: extractPhotoUrl(raw),
+    pasFoto: extractPhotoUrl(raw),
     dokumenUpload: {
       ...(raw.dokumenUpload || {}),
       pasPhoto: raw.pasPhoto || raw.pasFoto || raw.pasFotoUrl || raw.dokumenUpload?.pasPhoto || '',
