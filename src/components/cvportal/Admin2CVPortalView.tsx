@@ -20,7 +20,6 @@ import { FirebaseSyncControlBar } from '../common/FirebaseSyncControlBar';
 import { INITIAL_JOBS } from '../../data/seedData';
 import { autoTranslateCandidateCV } from '../../utils/japaneseTranslator';
 import { saveRirekishoToFirestore } from '../../lib/firebase';
-import { supabase, mapSupabaseSiswaToDomain } from '../../lib/supabase';
 import { formatRupiah } from '../../utils/financingCalculator';
 import { getStudentPhotoUrl, handleStudentImageError } from '../../utils/studentPhotoHelper';
 import { StudentPhotoBadge } from '../StudentPhotoBadge';
@@ -1995,22 +1994,8 @@ export const Admin2CVPortalView: React.FC = () => {
 
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Auto refresh data siswa dari Supabase & domain saat komponen Admin 2 dimuat
+  // Auto refresh data siswa dari Firebase Firestore saat komponen Admin 2 dimuat
   React.useEffect(() => {
-    async function loadInitialSupabaseStudents() {
-      try {
-        const { data, error } = await supabase.from('siswa').select('*');
-        if (!error && data && data.length > 0) {
-          console.log(`[Supabase Admin Dashboard] Memuat ${data.length} data siswa dari tabel siswa`);
-          const { students: spStudents, cvMap: spCvMap } = mapSupabaseSiswaToDomain(data);
-          if (spStudents.length > 0) setStudents(spStudents);
-          if (Object.keys(spCvMap).length > 0) setRirekishoRecords(spCvMap);
-        }
-      } catch (err) {
-        console.warn('Initial Supabase fetch warning:', err);
-      }
-    }
-    loadInitialSupabaseStudents();
     refreshFirebaseDomain('all').catch((err) => {
       console.warn('Initial domain refresh warning:', err);
     });
@@ -2019,100 +2004,24 @@ export const Admin2CVPortalView: React.FC = () => {
   const handleSyncFirebase = async () => {
     setIsSyncing(true);
     try {
-      // 1. Ambil data siswa langsung dari tabel 'siswa' di Supabase dengan sintaks resmi Supabase SDK
-      const { data, error } = await supabase.from('siswa').select('*');
-      let loadedFromSupabase = 0;
-
-      if (!error && data && data.length > 0) {
-        loadedFromSupabase = data.length;
-        console.log(`[Supabase Sync] Berhasil membaca ${data.length} data siswa dari tabel 'siswa' Supabase`);
-        const { students: spStudents, cvMap: spCvMap } = mapSupabaseSiswaToDomain(data);
-        if (spStudents.length > 0) {
-          setStudents(prev => {
-            const map = new Map<string, CalonSiswa>();
-            const nameMap = new Map<string, string>();
-            prev.forEach(s => {
-              if (s && s.id) {
-                map.set(s.id, s);
-                if (s.namaLengkap) nameMap.set(s.namaLengkap.trim().toUpperCase(), s.id);
-              }
-            });
-            spStudents.forEach(s => {
-              const sId = s.id;
-              const sName = (s.namaLengkap || '').trim().toUpperCase();
-              let tid = sId;
-              if (map.has(sId)) {
-                tid = sId;
-              } else if (sName && nameMap.has(sName)) {
-                tid = nameMap.get(sName)!;
-              }
-              const existing = map.get(tid);
-              if (existing) {
-                map.set(tid, {
-                  ...existing,
-                  ...s,
-                  id: tid,
-                  berkasDokumen: {
-                    ...(existing.berkasDokumen || {}),
-                    ...(s.berkasDokumen || {})
-                  }
-                });
-              } else {
-                map.set(tid, s);
-                if (sName) nameMap.set(sName, tid);
-              }
-            });
-            return Array.from(map.values());
-          });
-        }
-        if (Object.keys(spCvMap).length > 0) {
-          setRirekishoRecords(prev => {
-            const cvMap = { ...prev };
-            const nameToKey = new Map<string, string>();
-            Object.entries(cvMap).forEach(([k, v]) => {
-              if (v && v.namaLengkap) nameToKey.set(v.namaLengkap.trim().toUpperCase(), k);
-            });
-            for (const [k, v] of Object.entries(spCvMap)) {
-              const vName = (v.namaLengkap || '').trim().toUpperCase();
-              let targetKey = k;
-              if (cvMap[k]) {
-                targetKey = k;
-              } else if (vName && nameToKey.has(vName)) {
-                targetKey = nameToKey.get(vName)!;
-              }
-              if (cvMap[targetKey]) {
-                cvMap[targetKey] = {
-                  ...cvMap[targetKey],
-                  ...v,
-                  id: targetKey,
-                  siswaId: targetKey
-                };
-              } else {
-                cvMap[targetKey] = v;
-                if (vName) nameToKey.set(vName, targetKey);
-              }
-            }
-            return cvMap;
-          });
-        }
-      } else if (error) {
-        console.warn('Terjadi kesalahan query Supabase siswa:', error.message || error);
-      }
-
-      // 2. Jalankan sinkronisasi domain lengkap melalui AppContext
       const res = await refreshFirebaseDomain('all');
-
       setIsSyncing(false);
-      const totalCount = loadedFromSupabase > 0 ? loadedFromSupabase : (res.count || rirekishoList.length);
+      const totalCount = res?.count || rirekishoList.length;
       setToastMessage(
         lang === 'ja'
-          ? `Supabaseデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
-          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari tabel 'siswa' Supabase!`
+          ? `Firebase Firestoreデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
+          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari Firebase Firestore!`
       );
     } catch (err: any) {
-      console.error('Error syncing to Supabase:', err);
+      console.error('Error syncing to Firebase Firestore:', err);
       setIsSyncing(false);
       setToastMessage(
+        lang === 'ja'
+          ? `同期エラー: ${err?.message || '不明なエラー'}`
+          : `Gagal sinkronisasi: ${err?.message || 'Terjadi kesalahan'}`
+      );
+    }
+    setTimeout(() => setToastMessage(null), 5000);
         lang === 'ja'
           ? `同期エラー: ${err?.message || '不明なエラー'}`
           : `Gagal sinkronisasi: ${err?.message || 'Terjadi kesalahan'}`
@@ -7184,7 +7093,7 @@ export const Admin2CVPortalView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-400 space-y-1 pt-1 font-mono">
-                  <div>Supabase DB: Connected ({rirekishoList.length} {lang === 'ja' ? '名の生徒データ同期済' : 'data siswa sinkron'})</div>
+                  <div>Firebase Firestore DB: Terhubung ({rirekishoList.length} {lang === 'ja' ? '名の生徒データ同期済' : 'data siswa sinkron'})</div>
                   <div>Translate Engine: GenAI JP-EYD v2.4 Active</div>
                   <div>System Latency: 42ms</div>
                 </div>

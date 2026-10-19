@@ -2,13 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { initializeFirestore, getFirestore, doc, setDoc, deleteDoc, getDoc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { createClient } from '@supabase/supabase-js';
 import firebaseConfig from '../../firebase-applet-config.json';
-
-// Supabase Official Client Initialization
-export const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || "https://lvvpgcqzbvvpjshbkavk.supabase.co";
-export const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "sb_publishable_qQmxthBt0VtKH31I8WnFZg_tZww0nmX";
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Initialize Firebase App with provisioned applet configuration
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
@@ -225,23 +219,6 @@ export async function saveRirekishoToFirestore(cvData: any) {
       timestamp: serverTimestamp()
     });
     await setDoc(docRef, payload, { merge: true });
-
-    // Sinkronisasi langsung ke tabel 'siswa' Supabase
-    if (cvData.namaLengkap) {
-      try {
-        supabase.from('siswa').upsert({
-          nama: cvData.namaLengkap,
-          status_nihongo: cvData.levelBahasa || 'Belum Ada',
-          job_matching: cvData.statusProgres || 'Pending Nunggu Job',
-          keterangan: cvData.keteranganProgres || cvData.detailProgres || `Bidang: ${cvData.bidangKerja || 'PM'} | Kategori: ${cvData.kategoriKandidat || 'SISWA NON IJEF (New Comer)'}`
-        }).then(({ error }) => {
-          if (error) console.warn("Supabase background upsert note:", error.message);
-        });
-      } catch (sbErr) {
-        console.warn("Supabase background upsert warning:", sbErr);
-      }
-    }
-
     return { success: true, id: docId };
   } catch (err: any) {
     console.warn("Firestore save warning for rirekisho candidate:", err?.message || err);
