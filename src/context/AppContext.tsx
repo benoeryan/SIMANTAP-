@@ -42,6 +42,7 @@ import {
 import { useLanguage } from './LanguageContext';
 import { translations, AppLanguage, TranslationDictionary } from '../utils/translations';
 import { normalizeLeadData } from '../utils/crmAuthUtils';
+import { DEFAULT_INITIAL_ADMIN_USERS } from './AuthContext';
 
 const DEFAULT_MASTER_SETTINGS: any = {
   baseProgramCost: 25000000,
@@ -50,7 +51,11 @@ const DEFAULT_MASTER_SETTINGS: any = {
   dp30DpPercent: 30,
   adminFeePercent: 2.5,
   tenorOptions: [3, 6, 12, 18, 24, 36],
-  adminUsers: INITIAL_MITRA_ORGANIZATIONS
+  adminUsers: Array.from(
+    new Map(
+      [...DEFAULT_INITIAL_ADMIN_USERS, ...INITIAL_MITRA_ORGANIZATIONS].map((u) => [u.id || u.email, u])
+    ).values()
+  )
 };
 
 interface FirebaseSyncStatus {

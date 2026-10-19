@@ -47,7 +47,7 @@ interface AuthContextType {
 }
 
 // Built-in initial master admin users fallback
-const DEFAULT_INITIAL_ADMIN_USERS: AdminUser[] = [
+export const DEFAULT_INITIAL_ADMIN_USERS: AdminUser[] = [
   {
     id: 'ADM-SUPER-01',
     name: 'Super Admin IJEF Corp',
@@ -60,6 +60,32 @@ const DEFAULT_INITIAL_ADMIN_USERS: AdminUser[] = [
     lastLogin: 'Baru saja',
     passwordHint: 'AdminIJEF2026!',
     permissions: ['Akses Penuh', 'Sync Firestore DB', 'Kelola Role', 'CV Translate & Export', 'MANAGE_USERS_ROLES', 'MANAGE_JOBS', 'MANAGE_RIREKISHO', 'MANAGE_INTERVIEWS']
+  },
+  {
+    id: 'ADM-01',
+    name: 'Admin Siswa Akademik (SIM-SB)',
+    email: 'admin1@ijefcorp.com',
+    role: 'Admin 1 (Siswa Akademik)',
+    department: 'Divisi Akademik & Pengajaran Asrama/LMS',
+    portalAccess: 'ADMIN_1_IJEF',
+    status: 'AKTIF',
+    isSuperAdmin: false,
+    lastLogin: 'Aktif',
+    passwordHint: 'Admin123!',
+    permissions: ['MANAGE_STUDENTS', 'MANAGE_MCU_HEALTH', 'MANAGE_PSYCHOLOGY', 'MANAGE_FINANCING', 'MANAGE_CONTRACTS']
+  },
+  {
+    id: 'ADM-02',
+    name: 'Pengasuh Asrama & LMS IJEF',
+    email: 'siswasimsb@ijefcorp.com',
+    role: 'Admin 1 (Siswa Akademik)',
+    department: 'Divisi Operasional & Asrama Siswa',
+    portalAccess: 'ADMIN_1_IJEF',
+    status: 'AKTIF',
+    isSuperAdmin: false,
+    lastLogin: 'Aktif',
+    passwordHint: 'Admin123!',
+    permissions: ['MANAGE_STUDENTS', 'MANAGE_MCU_HEALTH', 'MANAGE_PSYCHOLOGY']
   },
   {
     id: 'ADM-SUPER-02',

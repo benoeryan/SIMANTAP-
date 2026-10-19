@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, DEFAULT_INITIAL_ADMIN_USERS } from '../../context/AuthContext';
 import { useEcosystemTranslation } from '../../hooks/useEcosystemTranslation';
 import { AdminRole, AdminUser, CalonSiswa, RoleAuditLog } from '../../types';
 import { saveAdminUserToFirestore, deleteAdminUserFromFirestore } from '../../lib/firebase';
@@ -191,36 +191,51 @@ export const Admin2AccountRoleManagement: React.FC = () => {
     const list: UnifiedAccount[] = [];
     const registeredEmails = new Set<string>();
 
-    // 1. Admin Users from Master Settings
-    const adminUsers = masterSettings.adminUsers || [];
+    // Combine Master Settings adminUsers with DEFAULT_INITIAL_ADMIN_USERS to guarantee default admins are always present
+    const adminMap = new Map<string, AdminUser>();
+    (masterSettings.adminUsers || []).forEach((adm) => {
+      if (adm && (adm.id || adm.email)) {
+        adminMap.set((adm.id || adm.email).toLowerCase(), adm);
+      }
+    });
+    DEFAULT_INITIAL_ADMIN_USERS.forEach((adm) => {
+      const key = (adm.id || adm.email).toLowerCase();
+      if (!adminMap.has(key)) {
+        adminMap.set(key, adm);
+      }
+    });
+
+    const adminUsers = Array.from(adminMap.values());
     adminUsers.forEach((adm) => {
       const email = adm.email.toLowerCase().trim();
       registeredEmails.add(email);
 
+      const rLow = (adm.role || '').toLowerCase();
       const isSuper =
         adm.isSuperAdmin ||
         adm.role === 'SuperAdmin' ||
-        adm.role?.toLowerCase().includes('super') ||
-        email.includes('admin@ijefcorp.com');
+        (rLow.includes('super') && !rLow.includes('admin 2') && !rLow.includes('admin 1') && !rLow.includes('marketing'));
 
       let roleCategory: UnifiedAccount['roleCategory'] = 'STAFF';
-      if (isSuper) {
+      if (adm.role === 'SuperAdmin' || (isSuper && !rLow.includes('admin 2') && !rLow.includes('admin 1') && !rLow.includes('marketing') && !rLow.includes('doc'))) {
         roleCategory = 'SUPER_ADMIN';
-      } else if (adm.role.includes('Admin 2') || adm.role.includes('Admin Doc') || adm.role.includes('Matching') || adm.portalAccess === 'ADMIN_2_CV_PORTAL') {
+      } else if (rLow.includes('admin 2') || rLow.includes('admin doc') || rLow.includes('matching') || adm.portalAccess === 'ADMIN_2_CV_PORTAL') {
         roleCategory = 'ADMIN_2';
-      } else if (adm.role.includes('Admin 1') || adm.role.includes('Admin Siswa') || adm.portalAccess === 'ADMIN_1_IJEF') {
+      } else if (rLow.includes('admin 1') || rLow.includes('admin siswa') || rLow.includes('akademik') || adm.portalAccess === 'ADMIN_1_IJEF') {
         roleCategory = 'ADMIN_1';
       } else if (
-        adm.role.toLowerCase().includes('marketing') ||
-        adm.role.toLowerCase().includes('konselor') ||
-        adm.role.toLowerCase().includes('telemarketing') ||
-        adm.role.toLowerCase().includes('digital market') ||
-        adm.role.toLowerCase().includes('acquisition') ||
-        adm.role.toLowerCase().includes('promosi') ||
+        rLow.includes('marketing') ||
+        rLow.includes('konselor') ||
+        rLow.includes('telemarketing') ||
+        rLow.includes('digital market') ||
+        rLow.includes('akuisisi') ||
+        rLow.includes('promosi') ||
         adm.portalAccess === 'MARKETING_PORTAL'
       ) {
         roleCategory = 'MARKETING';
-      } else if (adm.role.includes('Mitra') || adm.portalAccess === 'MITRA_PORTAL') {
+      } else if (rLow.includes('dokter') || rLow.includes('medis') || rLow.includes('legal') || rLow.includes('hr') || rLow.includes('finance')) {
+        roleCategory = 'STAFF';
+      } else if (rLow.includes('mitra') || adm.portalAccess === 'MITRA_PORTAL') {
         roleCategory = 'MITRA';
       }
 
