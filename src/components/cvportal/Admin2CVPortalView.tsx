@@ -2022,12 +2022,6 @@ export const Admin2CVPortalView: React.FC = () => {
       );
     }
     setTimeout(() => setToastMessage(null), 5000);
-        lang === 'ja'
-          ? `同期エラー: ${err?.message || '不明なエラー'}`
-          : `Gagal sinkronisasi: ${err?.message || 'Terjadi kesalahan'}`
-      );
-    }
-    setTimeout(() => setToastMessage(null), 5000);
   };
 
   const handleResetFilter = () => {
