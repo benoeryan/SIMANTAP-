@@ -23,20 +23,115 @@ export function mapSupabaseSiswaToDomain(data: any[] = []): {
   data.forEach((row, index) => {
     if (!row) return;
     const id = row.id ? String(row.id) : (row.siswa_id || `SP-${index + 1}`);
-    const namaLengkap = row.nama || row.nama_lengkap || row.namaLengkap || 'Siswa Supabase';
-    const email = row.email || `${id.toLowerCase()}@ijef.com`;
-    const noHp = row.no_hp || row.noHp || row.phone || '';
-    const photoUrl = row.foto || row.pas_foto || row.pas_photo || row.pasFoto || row.pasPhoto || '';
-    const statusProgres = row.job_matching || row.status_progres || row.statusProgres || 'Pending Nunggu Job';
-    const levelBahasa = row.status_nihongo || row.level_bahasa || row.levelBahasa || 'Belum Ada';
+    const namaLengkap = (row.nama || row.nama_lengkap || row.namaLengkap || 'Siswa Supabase').trim();
     const keterangan = row.keterangan || row.detail_progres || '';
+
+    // Extract Kontak / Phone
+    let noHp = row.no_hp || row.noHp || row.phone || '';
+    if (!noHp && keterangan) {
+      const phoneMatch = keterangan.match(/Kontak:\s*(\d[\d\s-]{7,})/i);
+      if (phoneMatch && phoneMatch[1]) {
+        noHp = phoneMatch[1].replace(/\s+/g, '').trim();
+      }
+    }
+
+    const email = row.email || (noHp ? `${noHp}@ijef.com` : `${id.toLowerCase()}@ijef.com`);
+    const photoUrl = row.foto || row.pas_foto || row.pas_photo || row.pasFoto || row.pasPhoto || '';
+
+    // 1. Extract Category from keterangan or row fields
+    let category = 'SISWA NON IJEF (New Comer)';
+    let rawCat = '';
+    const catMatch = keterangan.match(/Kategori:\s*([^|]+)/i);
+    if (catMatch && catMatch[1]) {
+      rawCat = catMatch[1].trim().toUpperCase();
+    } else if (row.kategori || row.kategori_kandidat || row.kategoriKandidat) {
+      rawCat = String(row.kategori || row.kategori_kandidat || row.kategoriKandidat).toUpperCase();
+    }
+
+    if (rawCat.includes('OFFLINE')) {
+      category = 'SISWA IJEF - Offline';
+    } else if (rawCat.includes('ONLINE')) {
+      category = 'SISWA IJEF - Online';
+    } else if (rawCat.includes('EX-MAGANG') || rawCat.includes('EX MAGANG') || rawCat.includes('TRAINEE')) {
+      category = 'MATCHING JOB - Ex-Magang / Ex-Trainee';
+    } else if (rawCat.includes('ENGINEER') || rawCat.includes('GIJINKOKU')) {
+      category = 'MATCHING JOB - Engineering / Gijinkoku';
+    } else if (rawCat.includes('MITRA')) {
+      category = 'SISWA MITRA';
+    } else {
+      category = 'SISWA NON IJEF (New Comer)';
+    }
+
+    // 2. Extract Gender from row fields, keterangan, or name heuristic
+    let gender: 'Laki-laki' | 'Perempuan' = 'Laki-laki';
+    let rawGender = String(row.jenis_kelamin || row.jenisKelamin || row.gender || row.sex || '').toLowerCase();
+    const genderMatch = keterangan.match(/Jenis Kelamin:\s*([^|]+)/i) || keterangan.match(/Gender:\s*([^|]+)/i);
+    if (genderMatch && genderMatch[1]) {
+      rawGender = genderMatch[1].trim().toLowerCase();
+    }
+
+    if (
+      rawGender.includes('perempuan') ||
+      rawGender.includes('wanita') ||
+      rawGender.includes('female') ||
+      rawGender.includes('女性') ||
+      rawGender.includes('女') ||
+      rawGender === 'p'
+    ) {
+      gender = 'Perempuan';
+    } else {
+      const uNama = namaLengkap.toUpperCase();
+      if (
+        ['INTAN', 'LISA', 'SHALSA', 'TRI', 'PURI', 'YUNIKA', 'ANNISA', 'SITI', 'NUR', 'DEWI', 'PUTRI', 'INDARWATI', 'KASIH', 'RETNO', 'RITA', 'MEGA', 'KARTIKA', 'EKA', 'SUSI', 'TIA', 'FITRI', 'WULAN', 'MELI', 'SARAH', 'LELA', 'SELI'].some(
+          (word) => uNama.includes(word)
+        )
+      ) {
+        gender = 'Perempuan';
+      }
+    }
+
+    // 3. Extract Bidang Kerja
+    let bidangKerja = row.bidang_kerja || row.bidangKerja || 'KAIGO';
+    const bidangMatch = keterangan.match(/Bidang:\s*([^|]+)/i);
+    if (bidangMatch && bidangMatch[1]) {
+      bidangKerja = bidangMatch[1].trim();
+    }
+
+    // 4. Extract Status Progres & Level Bahasa
+    const jm = String(row.job_matching || row.status_progres || row.statusProgres || '').trim();
+    const sn = String(row.status_nihongo || row.level_bahasa || row.levelBahasa || '').trim();
+    const levelBahasa = sn || 'Belum Ada';
+
+    let statusProgres = 'Pending Nunggu Job';
+    const sLow = (jm || sn).toLowerCase();
+    if (sLow.includes('belum lolos') || sLow.includes('tidak lolos nihongo')) {
+      statusProgres = 'Belum Lolos Nihongo Check';
+    } else if (sLow.includes('nihongo') || ['n3', 'n4', 'jft basic a2', 'disc', 'disc test done'].includes(sLow)) {
+      statusProgres = 'Nihongo Check';
+    } else if (sLow.includes('tidak lolos') || sLow.includes('gagal') || sLow.includes('rejected')) {
+      statusProgres = 'Tidak Lolos Interview';
+    } else if (sLow.includes('penjadwalan') || sLow.includes('terjadwal')) {
+      statusProgres = 'Penjadwalan Interview';
+    } else if (sLow.includes('lolos interview') || sLow.includes('naitei') || sLow.includes('hired')) {
+      statusProgres = 'Lolos Interview (Naitei)';
+    } else if (sLow.includes('on job') || sLow.includes('selesai')) {
+      statusProgres = 'Status On Job (Selesai)';
+    } else if (sLow.includes('cancel') || sLow.includes('batal')) {
+      statusProgres = 'Cancel';
+    } else if (sLow.includes('proses') || sLow.includes('applied')) {
+      statusProgres = 'On Proses';
+    } else if (sLow.includes('pending') || sLow.includes('nunggu') || sLow.includes('melamar') || sLow.includes('siap matching')) {
+      statusProgres = 'Pending Nunggu Job';
+    } else {
+      statusProgres = 'Belum Ada Status';
+    }
 
     const student: CalonSiswa = {
       id,
       namaLengkap,
       email,
       noHp,
-      kategoriKandidat: row.kategori || row.kategori_kandidat || 'SISWA NON IJEF (New Comer)',
+      kategoriKandidat: category as any,
       kewarganegaraan: 'WNI',
       noKtp: row.nik || row.no_ktp || '',
       noKk: row.no_kk || '',
@@ -45,7 +140,7 @@ export function mapSupabaseSiswaToDomain(data: any[] = []): {
       tanggalLahir: row.tanggal_lahir || '',
       umur: typeof row.umur === 'number' ? row.umur : 22,
       agama: (row.agama || 'Islam') as any,
-      jenisKelamin: row.jenis_kelamin === 'Perempuan' ? 'Perempuan' : 'Laki-laki',
+      jenisKelamin: gender,
       golonganDarah: (row.golongan_darah || 'O') as any,
       statusPerkawinan: (row.status_pernikahan || 'Lajang') as any,
       namaAyah: row.nama_ayah || '',
@@ -69,13 +164,13 @@ export function mapSupabaseSiswaToDomain(data: any[] = []): {
       kodeReferensi: row.kode_referensi || '',
       kodeJob: row.kode_job || 'DEF',
       kategoriKandidat: student.kategoriKandidat,
-      bidangKerja: row.bidang_kerja || 'KAIGO',
+      bidangKerja,
       namaLengkap,
       namaKatakana: row.nama_katakana || namaLengkap,
       namaPanggilan: row.nama_panggilan || (namaLengkap ? namaLengkap.split(' ')[0] : ''),
       email,
       noHp,
-      jenisKelamin: student.jenisKelamin,
+      jenisKelamin: gender,
       statusProgres,
       detailProgres: keterangan,
       catatanProgres: keterangan,

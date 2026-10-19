@@ -121,20 +121,18 @@ export function calculateCandidateStatistics(candidates: any[]): CandidateDashbo
     // Category source detection
     const cat = (c.kategoriKandidat || c.programDiminati || '').toString().trim();
     const catUpper = cat.toUpperCase();
-    if (catUpper.includes('IJEF - OFFLINE') || catUpper === 'SISWA IJEF - OFFLINE' || catUpper === 'IJEF OFFLINE') {
+    if (catUpper.includes('OFFLINE')) {
       stats.siswaIjefOffline++;
-    } else if (catUpper.includes('IJEF - ONLINE') || catUpper === 'SISWA IJEF - ONLINE' || catUpper === 'IJEF ONLINE') {
+    } else if (catUpper.includes('ONLINE')) {
       stats.siswaIjefOnline++;
-    } else if (catUpper.includes('MITRA') || catUpper.includes('SISWA MITRA')) {
-      stats.siswaMitra++;
-    } else if (catUpper.includes('NON IJEF') || catUpper.includes('NEW COMER') || catUpper.includes('NON-IJEF')) {
-      stats.siswaNonIjefNewComer++;
     } else if (catUpper.includes('EX-MAGANG') || catUpper.includes('EX MAGANG') || catUpper.includes('TRAINEE')) {
       stats.matchingExMagang++;
     } else if (catUpper.includes('ENGINEER') || catUpper.includes('GIJINKOKU')) {
       stats.matchingEngineering++;
+    } else if (catUpper.includes('MITRA')) {
+      stats.siswaMitra++;
     } else {
-      stats.lainnya++;
+      stats.siswaNonIjefNewComer++;
     }
     // Gender detection: Pria (Laki-laki) vs Wanita (Perempuan)
     const gender = getCandidateGender(c);
@@ -265,18 +263,18 @@ export const CandidateDashboardStatistics: React.FC<CandidateDashboardStatistics
     return candidates.filter((c) => {
       const cat = (c.kategoriKandidat || c.programDiminati || '').toString().trim().toUpperCase();
       const filterUp = selectedCategory.toUpperCase();
-      if (filterUp.includes('IJEF - OFFLINE') || filterUp.includes('SISWA IJEF - OFFLINE')) {
-        return cat.includes('IJEF - OFFLINE') || cat === 'SISWA IJEF - OFFLINE' || cat === 'IJEF OFFLINE';
-      } else if (filterUp.includes('IJEF - ONLINE') || filterUp.includes('SISWA IJEF - ONLINE')) {
-        return cat.includes('IJEF - ONLINE') || cat === 'SISWA IJEF - ONLINE' || cat === 'IJEF ONLINE';
-      } else if (filterUp.includes('MITRA')) {
-        return cat.includes('MITRA') || cat.includes('SISWA MITRA');
-      } else if (filterUp.includes('NEW COMER') || filterUp.includes('NON IJEF')) {
-        return cat.includes('NON IJEF') || cat.includes('NEW COMER') || cat.includes('NON-IJEF');
+      if (filterUp.includes('OFFLINE')) {
+        return cat.includes('OFFLINE');
+      } else if (filterUp.includes('ONLINE')) {
+        return cat.includes('ONLINE');
       } else if (filterUp.includes('EX-MAGANG') || filterUp.includes('EX MAGANG') || filterUp.includes('TRAINEE')) {
         return cat.includes('EX-MAGANG') || cat.includes('EX MAGANG') || cat.includes('TRAINEE');
       } else if (filterUp.includes('ENGINEER') || filterUp.includes('GIJINKOKU')) {
         return cat.includes('ENGINEER') || cat.includes('GIJINKOKU');
+      } else if (filterUp.includes('MITRA')) {
+        return cat.includes('MITRA');
+      } else if (filterUp.includes('NEW COMER') || filterUp.includes('NON IJEF')) {
+        return cat.includes('NON IJEF') || cat.includes('NEW COMER') || cat.includes('NON-IJEF');
       } else {
         return cat === filterUp || cat.includes(filterUp);
       }
