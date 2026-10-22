@@ -20,6 +20,7 @@ import { FirebaseSyncControlBar } from '../common/FirebaseSyncControlBar';
 import { INITIAL_JOBS } from '../../data/seedData';
 import { autoTranslateCandidateCV } from '../../utils/japaneseTranslator';
 import { saveRirekishoToFirestore } from '../../lib/firebase';
+import { supabase, mapSupabaseSiswaToDomain, fetchSiswaFromSupabase, saveSiswaToSupabase } from '../../lib/supabase';
 import { formatRupiah } from '../../utils/financingCalculator';
 import { getStudentPhotoUrl, handleStudentImageError } from '../../utils/studentPhotoHelper';
 import { StudentPhotoBadge } from '../StudentPhotoBadge';
@@ -1994,8 +1995,23 @@ export const Admin2CVPortalView: React.FC = () => {
 
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Auto refresh data siswa dari Firebase Firestore saat komponen Admin 2 dimuat
+  // Auto refresh data siswa dari Supabase DB saat komponen Admin 2 dimuat
   React.useEffect(() => {
+    async function loadInitialSupabaseStudents() {
+      try {
+        const res = await fetchSiswaFromSupabase();
+        if (res.success && res.students && res.students.length > 0) {
+          console.log(`[Supabase Admin Dashboard] Memuat ${res.students.length} data siswa dari tabel siswa`);
+          setStudents(res.students);
+          if (res.cvMap && Object.keys(res.cvMap).length > 0) {
+            setRirekishoRecords(res.cvMap);
+          }
+        }
+      } catch (err) {
+        console.warn('Initial Supabase fetch warning:', err);
+      }
+    }
+    loadInitialSupabaseStudents();
     refreshFirebaseDomain('all').catch((err) => {
       console.warn('Initial domain refresh warning:', err);
     });
@@ -2004,16 +2020,23 @@ export const Admin2CVPortalView: React.FC = () => {
   const handleSyncFirebase = async () => {
     setIsSyncing(true);
     try {
+      const spRes = await fetchSiswaFromSupabase();
+      if (spRes.success && spRes.students && spRes.students.length > 0) {
+        setStudents(spRes.students);
+        if (spRes.cvMap && Object.keys(spRes.cvMap).length > 0) {
+          setRirekishoRecords(spRes.cvMap);
+        }
+      }
       const res = await refreshFirebaseDomain('all');
       setIsSyncing(false);
-      const totalCount = res?.count || rirekishoList.length;
+      const totalCount = spRes.count || res?.count || rirekishoList.length;
       setToastMessage(
         lang === 'ja'
-          ? `Firebase Firestoreデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
-          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari Firebase Firestore!`
+          ? `Supabaseデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
+          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari Supabase Database!`
       );
     } catch (err: any) {
-      console.error('Error syncing to Firebase Firestore:', err);
+      console.error('Error syncing to Supabase:', err);
       setIsSyncing(false);
       setToastMessage(
         lang === 'ja'
@@ -7087,7 +7110,7 @@ export const Admin2CVPortalView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-400 space-y-1 pt-1 font-mono">
-                  <div>Firebase Firestore DB: Terhubung ({rirekishoList.length} {lang === 'ja' ? '名の生徒データ同期済' : 'data siswa sinkron'})</div>
+                  <div>Supabase DB: Connected ({rirekishoList.length} {lang === 'ja' ? '名の生徒データ同期済' : 'data siswa sinkron'})</div>
                   <div>Translate Engine: GenAI JP-EYD v2.4 Active</div>
                   <div>System Latency: 42ms</div>
                 </div>

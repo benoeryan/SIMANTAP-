@@ -189,3 +189,46 @@ export function mapSupabaseSiswaToDomain(data: any[] = []): {
 
   return { students, cvMap };
 }
+
+export async function fetchSiswaFromSupabase() {
+  try {
+    const { data, error } = await supabase.from('siswa').select('*');
+    if (error) {
+      console.warn('Supabase fetch error:', error);
+      return { success: false, data: [], error: error.message };
+    }
+    const { students, cvMap } = mapSupabaseSiswaToDomain(data || []);
+    return { success: true, count: data?.length || 0, data, students, cvMap };
+  } catch (err: any) {
+    console.warn('Supabase fetch exception:', err);
+    return { success: false, data: [], error: err?.message };
+  }
+}
+
+export async function saveSiswaToSupabase(cvData: any) {
+  try {
+    if (!cvData || (!cvData.namaLengkap && !cvData.nama)) {
+      return { success: false, error: 'Missing candidate name' };
+    }
+    const nama = (cvData.namaLengkap || cvData.nama || 'Siswa').trim();
+    const status_nihongo = cvData.levelBahasaJepang || cvData.levelBahasa || 'Belum Ada';
+    const job_matching = cvData.statusProgres || 'Pending Nunggu Job';
+    const keterangan = cvData.detailProgres || cvData.catatanProgres || `Bidang: ${cvData.bidangKerja || 'KAIGO'} | Kategori: ${cvData.kategoriKandidat || 'SISWA NON IJEF (New Comer)'}`;
+
+    const { data, error } = await supabase.from('siswa').upsert({
+      nama,
+      status_nihongo,
+      job_matching,
+      keterangan
+    });
+
+    if (error) {
+      console.warn('Supabase upsert note:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err: any) {
+    console.warn('Supabase upsert exception:', err);
+    return { success: false, error: err?.message };
+  }
+}
