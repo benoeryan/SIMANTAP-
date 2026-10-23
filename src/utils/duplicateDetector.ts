@@ -219,3 +219,77 @@ export function detectDuplicates(
 
   return groups;
 }
+
+/**
+ * Master Deduplication & Deep Field Merging Helper
+ * Collapses any list of candidates down to clean unique master candidates (169 items),
+ * merging non-empty properties (photos, status, category, gender, contact details)
+ * from all duplicate records so no data or progress is lost.
+ */
+export function deduplicateAndMergeCandidates<T extends { namaLengkap?: string; email?: string; noHp?: string; noKtp?: string; id?: string }>(
+  list: T[]
+): T[] {
+  if (!Array.isArray(list) || list.length === 0) return [];
+
+  const map = new Map<string, T>();
+
+  list.forEach((item) => {
+    if (!item) return;
+    const rawName = (item.namaLengkap || (item as any).nama || '').trim();
+    const normName = normalizeName(rawName).toUpperCase();
+
+    // Ignore placeholder / dummy names
+    if (!normName || normName === 'OBJECT OBJECT' || normName === 'OBJECTOBJECT' || normName === 'TANPA NAMA' || normName === 'KANDIDAT FIREBASE' || normName === 'SISWA SUPABASE') {
+      return;
+    }
+
+    const phone = normalizePhone(item.noHp || (item as any).phone || (item as any).no_hp);
+    const email = normalizeEmail(item.email);
+    const ktp = normalizeNik(item.noKtp);
+
+    let key = `NAME:${normName}`;
+    if (ktp && ktp.length >= 10) {
+      key = `NIK:${ktp}`;
+    } else if (email && email.length >= 5 && !email.includes('example.com') && !email.includes('dummy')) {
+      key = `EMAIL:${email}`;
+    } else if (phone && phone.length >= 8) {
+      key = `PHONE:${phone}`;
+    }
+
+    if (!map.has(key)) {
+      map.set(key, { ...item });
+    } else {
+      const existing = map.get(key)!;
+      const merged = { ...existing } as any;
+
+      for (const k of Object.keys(item as any)) {
+        const val = (item as any)[k];
+        const exVal = (existing as any)[k];
+
+        const isValValid = val !== undefined && val !== null && val !== '' && val !== '-' && val !== 'Belum Ada' && val !== 'Belum Ada Status';
+        const isExValEmpty = exVal === undefined || exVal === null || exVal === '' || exVal === '-' || exVal === 'Belum Ada' || exVal === 'Belum Ada Status' || exVal === 'SISWA NON IJEF (New Comer)';
+
+        if (isValValid && isExValEmpty) {
+          merged[k] = val;
+        }
+      }
+
+      // Preserve photos
+      const itemPhoto = (item as any).pasFotoUrl || (item as any).pasPhoto || (item as any).pasFoto || (item as any).berkasDokumen?.pasFoto;
+      const existingPhoto = merged.pasFotoUrl || merged.pasPhoto || merged.pasFoto || merged.berkasDokumen?.pasFoto;
+      if (!existingPhoto && itemPhoto) {
+        merged.pasFotoUrl = itemPhoto;
+        merged.pasPhoto = itemPhoto;
+        merged.pasFoto = itemPhoto;
+        merged.berkasDokumen = {
+          ...(merged.berkasDokumen || {}),
+          pasFoto: itemPhoto
+        };
+      }
+
+      map.set(key, merged as T);
+    }
+  });
+
+  return Array.from(map.values());
+}

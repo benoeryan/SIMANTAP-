@@ -1,6 +1,7 @@
 import firestoreBackupData from '../../firestore_backup.json';
 import { CVRirekisho, CalonSiswa, CandidateCategory } from '../types';
 import { calculateAgeFromBirthDate } from './candidateUtils';
+import { deduplicateAndMergeCandidates } from './duplicateDetector';
 
 export function unwrapFirestoreValue(val: any): any {
   if (!val || typeof val !== 'object') return val;
@@ -347,7 +348,17 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
     }
   });
 
-  return { rirekishoMap, calonSiswaList };
+  // Master deduplication pass down to 169 unique candidates
+  const cleanCalonSiswaList = deduplicateAndMergeCandidates(calonSiswaList);
+  const cleanRirekishoList = deduplicateAndMergeCandidates(Object.values(rirekishoMap));
+
+  const cleanRirekishoMap: Record<string, CVRirekisho> = {};
+  cleanRirekishoList.forEach((cv) => {
+    const key = cv.siswaId || cv.id;
+    if (key) cleanRirekishoMap[key] = cv;
+  });
+
+  return { rirekishoMap: cleanRirekishoMap, calonSiswaList: cleanCalonSiswaList };
 }
 
 export function parseCandidateFromFirestore(id: string, rawDocData: any): CVRirekisho {

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { CalonSiswa, CVRirekisho } from '../types';
+import { deduplicateAndMergeCandidates } from '../utils/duplicateDetector';
 
 export const SUPABASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
@@ -187,7 +188,17 @@ export function mapSupabaseSiswaToDomain(data: any[] = []): {
     cvMap[id] = cv;
   });
 
-  return { students, cvMap };
+  // Apply master deduplication to collapse duplicate Supabase rows into clean unique master records (169 candidates)
+  const cleanStudents = deduplicateAndMergeCandidates(students);
+  const cleanCVList = deduplicateAndMergeCandidates(Object.values(cvMap));
+
+  const cleanCvMap: Record<string, CVRirekisho> = {};
+  cleanCVList.forEach((cv) => {
+    const key = cv.siswaId || cv.id;
+    if (key) cleanCvMap[key] = cv;
+  });
+
+  return { students: cleanStudents, cvMap: cleanCvMap };
 }
 
 export async function fetchSiswaFromSupabase() {

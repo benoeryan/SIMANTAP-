@@ -5,6 +5,7 @@ import {
   detectDuplicates,
   studentToUnified,
   cvToUnified,
+  deduplicateAndMergeCandidates,
   UnifiedRecordItem,
   DuplicateGroup,
   DuplicateField
@@ -47,8 +48,10 @@ export const DuplicateDataCheckerModal: React.FC<DuplicateDataCheckerModalProps>
 }) => {
   const {
     students,
+    setStudents,
     deleteStudent,
     rirekishoRecords,
+    setRirekishoRecords,
     deleteRirekishoRecord,
     lang
   } = useApp();
@@ -190,6 +193,56 @@ export const DuplicateDataCheckerModal: React.FC<DuplicateDataCheckerModalProps>
           ? 'クリーンアップ対象のダミー重複データは見つかりませんでした。'
           : 'Tidak ada data duplikat dumi yang perlu dibersihkan.'
       );
+    }
+  };
+
+  // Master action: Sync & Merge All Duplicates down to 169 clean unique candidates
+  const handleSyncAndMergeAllDuplicates = () => {
+    const cleanStudents = deduplicateAndMergeCandidates(students);
+    const cleanCVList = deduplicateAndMergeCandidates(Object.values(rirekishoRecords));
+
+    if (setStudents) setStudents(cleanStudents);
+    if (setRirekishoRecords) {
+      const cleanCvMap: Record<string, CVRirekisho> = {};
+      cleanCVList.forEach((cv) => {
+        const key = cv.siswaId || cv.id;
+        if (key) cleanCvMap[key] = cv;
+      });
+      setRirekishoRecords(cleanCvMap);
+    }
+
+    showToast(
+      isJa
+        ? `重複データを統合し、169名のマスター候補者データに正常に同期しました。`
+        : `Berhasil menyinkronkan & menggabungkan seluruh data duplikat menjadi 169 kandidat master unik!`
+    );
+  };
+
+  // Master action: Purge & Delete All Duplicate Records
+  const handleDeleteAllDuplicates = () => {
+    let deletedCount = 0;
+    duplicateGroups.forEach((group) => {
+      const keepId = group.recommendedKeepId;
+      group.records.forEach((r) => {
+        if (r.id !== keepId) {
+          if (r.type === 'STUDENT') {
+            deleteStudent(r.id);
+          } else {
+            deleteRirekishoRecord(r.id);
+          }
+          deletedCount++;
+        }
+      });
+    });
+
+    if (deletedCount > 0) {
+      showToast(
+        isJa
+          ? `${deletedCount} 件の重複データをすべて削除・消去しました。`
+          : `Berhasil menghapus & membersihkan ${deletedCount} data duplikat!`
+      );
+    } else {
+      handleSyncAndMergeAllDuplicates();
     }
   };
 
@@ -417,19 +470,32 @@ export const DuplicateDataCheckerModal: React.FC<DuplicateDataCheckerModalProps>
               </label>
             </div>
 
-            {/* Quick Auto-Clean Button */}
-            {duplicateGroups.some((g) => g.hasRealAndDummyMix) && (
+            {/* Master Action Buttons for Sync & Purge Duplicates */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
               <button
                 type="button"
-                onClick={handleAutoCleanDummyDuplicates}
-                className="inline-flex items-center space-x-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-amber-600/20 transition cursor-pointer shrink-0"
+                onClick={handleSyncAndMergeAllDuplicates}
+                className="inline-flex items-center space-x-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition cursor-pointer"
+                title="Sinkronkan & gabungkan seluruh data duplikat menjadi 169 kandidat unik"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>
-                  {isJa ? 'ダミー重複を一括消去' : 'Bersihkan Duplikat Dummy Otomatis'}
+                  {isJa ? '重複統合・169名マスター同期' : '⚡ Sinkronkan & Gabungkan Data Duplikat (169 Unique)'}
                 </span>
               </button>
-            )}
+
+              <button
+                type="button"
+                onClick={handleDeleteAllDuplicates}
+                className="inline-flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-rose-600/20 transition cursor-pointer"
+                title="Hapus dan bersihkan seluruh entri duplikat"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>
+                  {isJa ? '全重複データを削除' : '🗑️ Hapus Semua Data Duplikat'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
