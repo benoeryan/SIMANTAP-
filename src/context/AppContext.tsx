@@ -35,6 +35,7 @@ import {
   fetchJobPostingsFromFirestore
 } from '../lib/firebase';
 import { saveSiswaToSupabase } from '../lib/supabase';
+import { deduplicateAndMergeCandidates } from '../utils/duplicateDetector';
 import {
   INITIAL_LEADS,
   INITIAL_CAMPAIGNS,
@@ -183,7 +184,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       });
     }
-    return Array.from(studentMap.values());
+    const rawList = Array.from(studentMap.values());
+    return deduplicateAndMergeCandidates(rawList);
   });
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(() => {
@@ -213,7 +215,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       });
     }
-    return defaultMap;
+    const rawList = Object.values(defaultMap) as CVRirekisho[];
+    const uniqueList = deduplicateAndMergeCandidates(rawList);
+    const cleanMap: Record<string, CVRirekisho> = {};
+    uniqueList.forEach(cv => {
+      cleanMap[cv.siswaId || cv.id] = cv;
+    });
+    return cleanMap;
   });
 
   const [jobPostings, setJobPostings] = useState<JobPosting[]>(() => INITIAL_JOBS);
