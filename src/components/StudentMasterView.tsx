@@ -101,10 +101,69 @@ export const StudentMasterView: React.FC = () => {
     }
   }, []);
 
-  // View Mode: 'list' (Table) vs 'card' (Grid)
-  const [viewMode, setViewMode] = useState<'list' | 'card'>(() => {
-    return (localStorage.getItem('ijef_student_view_mode') as 'list' | 'card') || 'list';
+  // View Mode: 'list' (Table) vs 'card' (Grid) vs 'pipeline' (Kanban)
+  const [viewMode, setViewMode] = useState<'list' | 'card' | 'pipeline'>(() => {
+    return (localStorage.getItem('ijef_student_view_mode') as 'list' | 'card' | 'pipeline') || 'list';
   });
+
+  // Kanban Drag & Drop State for Admin Siswa
+  const [draggedStudentId, setDraggedStudentId] = useState<string | null>(null);
+  const [dragOverStageSiswa, setDragOverStageSiswa] = useState<string | null>(null);
+  const [quickMoveStudent, setQuickMoveStudent] = useState<CalonSiswa | null>(null);
+
+  const handleStudentDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedStudentId(id);
+    e.dataTransfer.setData('text/plain', id);
+  };
+  const handleStudentDragEnd = () => {
+    setDraggedStudentId(null);
+    setDragOverStageSiswa(null);
+  };
+  const handleStudentDragOver = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    if (dragOverStageSiswa !== stage) setDragOverStageSiswa(stage);
+  };
+  const handleStudentDragEnter = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    setDragOverStageSiswa(stage);
+  };
+  const handleStudentDragLeave = (e: React.DragEvent, stage: string) => {
+    if (dragOverStageSiswa === stage) setDragOverStageSiswa(null);
+  };
+  const handleStudentDrop = (e: React.DragEvent, targetStage: string) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain') || draggedStudentId;
+    setDragOverStageSiswa(null);
+    setDraggedStudentId(null);
+    if (id && setStudents) {
+      const student = students.find((s) => s.id === id || s.noKtp === id);
+      if (student) {
+        const updated = {
+          ...student,
+          statusPendaftaran: targetStage,
+          statusProgres: targetStage
+        };
+        setStudents(prev => prev.map(st => st.id === student.id ? updated : st));
+        setToastMessage(`Status siswa ${student.namaLengkap} dipindah ke ${targetStage}`);
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    }
+  };
+
+  const handleStudentStageMove = (studentId: string, targetStage: string) => {
+    const student = students.find((s) => s.id === studentId || s.noKtp === studentId);
+    if (student && setStudents) {
+      const updated = {
+        ...student,
+        statusPendaftaran: targetStage,
+        statusProgres: targetStage
+      };
+      setStudents(prev => prev.map(st => st.id === student.id ? updated : st));
+      setToastMessage(`Status siswa ${student.namaLengkap} dipindah ke ${targetStage}`);
+      setTimeout(() => setToastMessage(null), 3000);
+      setQuickMoveStudent(null);
+    }
+  };
 
   // Source Filter: 'ALL' | 'REAL_FIREBASE' | 'DUMMY'
   const [sourceFilter, setSourceFilter] = useState<'ALL' | 'REAL_FIREBASE' | 'DUMMY'>(() => {
@@ -229,7 +288,7 @@ export const StudentMasterView: React.FC = () => {
   const [showDriveModal, setShowDriveModal] = useState<boolean>(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false);
 
-  const handleSetViewMode = (mode: 'list' | 'card') => {
+  const handleSetViewMode = (mode: 'list' | 'card' | 'pipeline') => {
     setViewMode(mode);
     try {
       localStorage.setItem('ijef_student_view_mode', mode);
@@ -589,7 +648,7 @@ export const StudentMasterView: React.FC = () => {
               </button>
             )}
 
-            {/* View Mode Switcher (List vs Card) */}
+            {/* View Mode Switcher (List vs Card vs Pipeline) */}
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs">
               <button
                 type="button"
@@ -617,6 +676,20 @@ export const StudentMasterView: React.FC = () => {
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span>{lang === 'ja' ? 'カード' : 'Mode Kartu'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSetViewMode('pipeline')}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  viewMode === 'pipeline'
+                    ? 'bg-white text-emerald-700 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title={lang === 'ja' ? 'カンバン・パイプライン表示' : 'Tampilan Kanban Pipeline'}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>{lang === 'ja' ? 'カンバン' : 'Kanban Pipeline'}</span>
               </button>
             </div>
 
@@ -1059,8 +1132,202 @@ export const StudentMasterView: React.FC = () => {
           </div>
         </div>
 
-        {/* CONDITIONAL RENDERING: LIST MODE (TABLE) VS CARD MODE (GRID) */}
-        {viewMode === 'card' ? (
+        {/* CONDITIONAL RENDERING: PIPELINE VS CARD VS LIST */}
+        {viewMode === 'pipeline' ? (
+          /* ======================================================================== */
+          /* KANBAN PIPELINE VIEW (ADMIN SISWA)                                       */
+          /* ======================================================================== */
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border border-emerald-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center space-x-3 text-xs text-slate-800">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <GripVertical className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-extrabold text-slate-900">
+                    {lang === 'ja' ? '生徒進捗カンバン・パイプライン:' : 'Kanban Pipeline Tracking Progress Siswa:'}
+                  </span>{' '}
+                  <span className="text-slate-600">
+                    {lang === 'ja'
+                      ? 'カードをドラッグ＆ドロップしてステージを移動するか、メニューボタンをご利用ください。'
+                      : 'Geser kartu siswa antar kolom tahap pendaftaran/pelatihan, atau gunakan menu cepat di sudut kartu.'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 shrink-0">
+                <div className="text-xs font-bold text-emerald-900 bg-white px-3 py-1.5 rounded-xl border border-emerald-200 shadow-2xs">
+                  ✨ {filteredStudents.length} {lang === 'ja' ? '名の生徒' : 'Siswa Ditampilkan'}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+              {[
+                { status: 'Draft', label: lang === 'ja' ? '1. ドラフト (新規)' : '1. Draft / Baru', desc: lang === 'ja' ? '仮登録・情報入力段階' : 'Pendaftaran awal & pengisian data' },
+                { status: 'Terverifikasi', label: lang === 'ja' ? '2. 管理者確認済' : '2. Terverifikasi Admin', desc: lang === 'ja' ? '書類・資格の承認' : 'Validasi berkas & biodata oleh admin' },
+                { status: 'MCU & Asesmen', label: lang === 'ja' ? '3. 健康診断・適性' : '3. MCU & Asesmen', desc: lang === 'ja' ? '健康診断・DISC・適性検査' : 'Pemeriksaan kesehatan & tes psikologi' },
+                { status: 'Siap Matching', label: lang === 'ja' ? '4. マッチング準備' : '4. Siap Matching Job', desc: lang === 'ja' ? 'JIS履歴書完成・日本求人応募可' : 'CV Rirekisho siap & siap lamar job' },
+                { status: 'Diterima', label: lang === 'ja' ? '5. 採用決定 (渡航)' : '5. Diterima / Berangkat', desc: lang === 'ja' ? '内定獲得・ビザ・日本出発' : 'Lolos seleksi & persiapan keberangkatan' },
+                { status: 'Ditolak', label: lang === 'ja' ? '6. 不採用・終了' : '6. Ditolak / Cancel', desc: lang === 'ja' ? '手続き中断または終了' : 'Proses dihentikan atau dibatalkan' }
+              ].map((stage) => {
+                const stageStudents = filteredStudents.filter((s) => {
+                  const p = s.statusPendaftaran || 'Terdaftar';
+                  if (stage.status === 'MCU & Asesmen') return checkMcuAndAssessment(s).isComplete && p !== 'Diterima';
+                  if (stage.status === 'Ditolak') return p === 'Ditolak' || p === 'Cancel';
+                  return p === stage.status || (stage.status === 'Draft' && (p === 'Draft' || p === 'Terdaftar'));
+                });
+                const isOverThisStage = dragOverStageSiswa === stage.status;
+
+                return (
+                  <div
+                    key={stage.status}
+                    onDragOver={(e) => handleStudentDragOver(e, stage.status)}
+                    onDragEnter={(e) => handleStudentDragEnter(e, stage.status)}
+                    onDragLeave={(e) => handleStudentDragLeave(e, stage.status)}
+                    onDrop={(e) => handleStudentDrop(e, stage.status)}
+                    className={`border rounded-2xl p-3 flex flex-col min-h-[520px] transition-all ${
+                      isOverThisStage
+                        ? 'bg-emerald-100/90 border-emerald-500 ring-4 ring-emerald-500/20 shadow-lg scale-[1.01]'
+                        : 'bg-slate-100/90 border-slate-200'
+                    }`}
+                  >
+                    <div className={`p-2.5 rounded-xl border shadow-2xs mb-3 ${isOverThisStage ? 'bg-emerald-200 border-emerald-400' : 'bg-white border-slate-200'}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-xs text-slate-900">{stage.label}</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-900 text-white font-mono text-[10px] font-bold flex items-center justify-center">
+                          {stageStudents.length}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{stage.desc}</p>
+                    </div>
+
+                    <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[620px] pr-0.5">
+                      {isOverThisStage && draggedStudentId && (
+                        <div className="p-3 border-2 border-dashed border-emerald-500 bg-emerald-100/70 rounded-xl text-center text-xs font-bold text-emerald-900 animate-pulse">
+                          {lang === 'ja' ? 'ここにドロップ' : 'Lepas untuk pindah'}
+                        </div>
+                      )}
+
+                      {stageStudents.length === 0 && !isOverThisStage ? (
+                        <div className="p-4 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-[10px]">
+                          {lang === 'ja' ? '生徒なし' : 'Tidak ada siswa'}
+                        </div>
+                      ) : (
+                        stageStudents.map((s) => (
+                          <div
+                            key={s.id}
+                            draggable={true}
+                            onDragStart={(e) => handleStudentDragStart(e, s.id)}
+                            onDragEnd={handleStudentDragEnd}
+                            className={`p-3 rounded-xl border bg-white shadow-2xs hover:shadow-md transition-all space-y-2 cursor-grab active:cursor-grabbing select-none ${
+                              draggedStudentId === s.id ? 'opacity-40 scale-95 border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-emerald-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className="font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 truncate">
+                                {s.kategoriKandidat || (s.kategori || 'IJEF Student')}
+                              </span>
+                              <button
+                                type="button"
+                                draggable={false}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setQuickMoveStudent(s);
+                                }}
+                                className="p-1 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition cursor-pointer"
+                                title="Quick Move"
+                              >
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <StudentPhotoBadge student={s} rirekisho={rirekishoRecords[s.id]} size="sm" />
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-extrabold text-slate-900 text-xs leading-snug truncate">
+                                  {s.namaLengkap}
+                                </h4>
+                                <p className="text-[10px] text-slate-500 font-mono truncate">
+                                  ID: {s.id}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="pt-1 flex items-center justify-between text-[10px] border-t border-slate-100">
+                              <button
+                                type="button"
+                                draggable={false}
+                                onClick={() => {
+                                  setSelectedStudentId(s.id);
+                                  setEditingStudent(s);
+                                }}
+                                className="text-emerald-700 font-bold hover:underline flex items-center space-x-1"
+                              >
+                                <Edit2 className="w-3 h-3" />
+                                <span>{lang === 'ja' ? '編集' : 'Edit Profil'}</span>
+                              </button>
+                              <span className="text-slate-400 font-mono text-[9px]">
+                                {s.noHp || '-'}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Quick Move Modal for Student */}
+            {quickMoveStudent && (
+              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-emerald-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-black text-slate-900">
+                      {lang === 'ja' ? '生徒進捗ステージ変更' : 'Pindah Tahap Progress Siswa'}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setQuickMoveStudent(null)}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                    <p className="text-xs font-bold text-slate-900">{quickMoveStudent.namaLengkap}</p>
+                    <p className="text-[10px] text-slate-600 font-mono">ID: {quickMoveStudent.id}</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      {lang === 'ja' ? '新しいステージを選択:' : 'Pilih Tahapan Pendaftaran/Progres:'}
+                    </label>
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {['Draft', 'Terdaftar', 'Terverifikasi', 'MCU & Asesmen', 'Siap Matching', 'Diterima', 'Ditolak'].map((stageKey) => (
+                        <button
+                          key={stageKey}
+                          type="button"
+                          onClick={() => handleStudentStageMove(quickMoveStudent.id, stageKey)}
+                          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between ${
+                            quickMoveStudent.statusPendaftaran === stageKey
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : 'bg-slate-100 hover:bg-emerald-100 text-slate-800'
+                          }`}
+                        >
+                          <span>{stageKey}</span>
+                          {quickMoveStudent.statusPendaftaran === stageKey && (
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : viewMode === 'card' ? (
           /* ======================================================================== */
           /* CARD VIEW (GRID MODE)                                                    */
           /* ======================================================================== */

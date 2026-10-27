@@ -179,8 +179,65 @@ export const Admin2CVPortalView: React.FC = () => {
     bilingual
   } = useEcosystemTranslation('adminDoc');
 
-  const [activeTab, setActiveTab] = useState<'monitoring' | 'kandidat' | 'jobs' | 'applications' | 'accounts' | 'settings' | 'dana' | 'kontrak' | 'petunjuk' | 'mitra-approval' | 'mitra-terdaftar'>('monitoring');
+  const [activeTab, setActiveTab] = useState<'monitoring' | 'kandidat' | 'pipeline' | 'jobs' | 'applications' | 'accounts' | 'settings' | 'dana' | 'kontrak' | 'petunjuk' | 'mitra-approval' | 'mitra-terdaftar'>('monitoring');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Kanban Drag & Drop State for Admin Doc
+  const [draggedCandidateId, setDraggedCandidateId] = useState<string | null>(null);
+  const [dragOverStageDoc, setDragOverStageDoc] = useState<string | null>(null);
+  const [quickMoveCandidate, setQuickMoveCandidate] = useState<CVRirekisho | null>(null);
+
+  const handleCandidateDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedCandidateId(id);
+    e.dataTransfer.setData('text/plain', id);
+  };
+  const handleCandidateDragEnd = () => {
+    setDraggedCandidateId(null);
+    setDragOverStageDoc(null);
+  };
+  const handleCandidateDragOver = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    if (dragOverStageDoc !== stage) setDragOverStageDoc(stage);
+  };
+  const handleCandidateDragEnter = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    setDragOverStageDoc(stage);
+  };
+  const handleCandidateDragLeave = (e: React.DragEvent, stage: string) => {
+    if (dragOverStageDoc === stage) setDragOverStageDoc(null);
+  };
+  const handleCandidateDrop = (e: React.DragEvent, targetStage: string) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain') || draggedCandidateId;
+    setDragOverStageDoc(null);
+    setDraggedCandidateId(null);
+    if (id) {
+      const cvRecord = rirekishoList.find((c) => c.siswaId === id || c.id === id || c.id?.toString() === id.toString());
+      if (cvRecord) {
+        saveRirekishoRecord({
+          ...cvRecord,
+          statusProgres: targetStage,
+          detailProgres: `Status diperbarui ke [${targetStage}] via Kanban Drag & Drop`
+        });
+        setToastMessage(`Status kandidat ${cvRecord.namaLengkap} berhasil dipindah ke ${targetStage}`);
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    }
+  };
+
+  const handleCandidateStageMove = (candidateId: string, targetStage: string) => {
+    const cvRecord = rirekishoList.find((c) => c.siswaId === candidateId || c.id === candidateId || c.id?.toString() === candidateId.toString());
+    if (cvRecord) {
+      saveRirekishoRecord({
+        ...cvRecord,
+        statusProgres: targetStage,
+        detailProgres: `Status diperbarui ke [${targetStage}] via Kanban Quick Move`
+      });
+      setToastMessage(`Status kandidat ${cvRecord.namaLengkap} berhasil dipindah ke ${targetStage}`);
+      setTimeout(() => setToastMessage(null), 3000);
+      setQuickMoveCandidate(null);
+    }
+  };
 
   useEffect(() => {
     const handleToggle = () => setSidebarOpen((prev) => !prev);
@@ -2274,6 +2331,14 @@ export const Admin2CVPortalView: React.FC = () => {
       desc: lang === 'ja' ? '統計メトリクスと候補者サマリー' : 'Metrik statistik & ringkasan kandidat'
     },
     {
+      id: 'pipeline',
+      label: lang === 'ja' ? '📋 カンバン・パイプライン' : 'Kanban Pipeline',
+      badge: rirekishoList.length,
+      icon: Sparkles,
+      color: 'purple',
+      desc: lang === 'ja' ? 'ドラッグ＆ドロップで候補者進捗管理' : 'Kelola tahapan seleksi kandidat dengan Kanban Drag & Drop'
+    },
+    {
       id: 'kandidat',
       label: lang === 'ja' ? '👥 JIS標準履歴書候補者データ' : 'Data Kandidat CV Rirekisho',
       badge: rirekishoList.length,
@@ -2548,6 +2613,242 @@ export const Admin2CVPortalView: React.FC = () => {
 
       {/* Global Firebase Real-Time Synchronization & Auto-Update Control Bar */}
       <FirebaseSyncControlBar domain="all" variant="card" showCounters={true} />
+
+      {/* Global Firebase Real-Time Synchronization & Auto-Update Control Bar */}
+      <FirebaseSyncControlBar domain="all" variant="card" showCounters={true} />
+
+      {/* TAB KANBAN PIPELINE ADMIN DOC */}
+      {activeTab === 'pipeline' && (
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-amber-50 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center space-x-3 text-xs text-slate-800">
+              <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <GripVertical className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-extrabold text-slate-900">
+                  {bilingual('Kanban Drag & Drop Pipeline Admin Doc:', '管理者ドキュメント 看板パイプライン:')}
+                </span>{' '}
+                <span className="text-slate-600">
+                  {bilingual(
+                    'Geser kartu kandidat ke kolom tahap seleksi tujuan, atau gunakan tombol menu cepat di sudut kanan atas kartu.',
+                    '候補者カードを目的のステージ列にドラッグ＆ドロップするか、カードのメニューボタンをご利用ください。'
+                  )}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <div className="flex items-center space-x-1.5 bg-white border border-purple-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold shadow-2xs">
+                <Search className="w-3.5 h-3.5 text-purple-600" />
+                <input
+                  type="text"
+                  placeholder={bilingual('Cari kandidat di pipeline...', '候補者を検索...')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-transparent text-xs focus:outline-none w-36 sm:w-48"
+                />
+              </div>
+
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="bg-white border border-purple-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold shadow-2xs focus:outline-none cursor-pointer"
+              >
+                <option value="Semua">{bilingual('Semua Kategori', '全カテゴリー')}</option>
+                <option value="SISWA IJEF - Offline">SISWA IJEF - Offline</option>
+                <option value="SISWA IJEF - Online">SISWA IJEF - Online</option>
+                <option value="SISWA NON IJEF (New Comer)">SISWA NON IJEF</option>
+                <option value="SISWA MITRA / NON IJEF">SISWA MITRA</option>
+              </select>
+
+              <div className="text-xs font-bold text-purple-900 bg-white px-3 py-1.5 rounded-xl border border-purple-200 shadow-2xs">
+                ✨ {filteredCVs.length} {bilingual('Kandidat Aktif', '候補者')}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+            {[
+              { status: 'Nihongo check', label: lang === 'ja' ? '1. Nihongo Check' : '1. Nihongo Check', color: 'border-blue-500 bg-blue-50/50 text-blue-900', desc: lang === 'ja' ? '日本語確認' : 'Cek kemampuan bahasa Jepang' },
+              { status: 'Pending Nunggu Job', label: lang === 'ja' ? '2. 求人待ち' : '2. Pending Nunggu Job', color: 'border-amber-500 bg-amber-50/50 text-amber-900', desc: lang === 'ja' ? '求人マッチング待機' : 'Menunggu pencocokan lowongan' },
+              { status: 'Terjadwal Interview', label: lang === 'ja' ? '3. 面接予定' : '3. Terjadwal Interview', color: 'border-indigo-500 bg-indigo-50/50 text-indigo-900', desc: lang === 'ja' ? '面接スケジュール決定' : 'Jadwal interview Zoom/offline' },
+              { status: 'On Proses', label: lang === 'ja' ? '4. 選考進行中' : '4. On Proses', color: 'border-purple-500 bg-purple-50/50 text-purple-900', desc: lang === 'ja' ? '企業選考中' : 'Proses seleksi perusahaan' },
+              { status: 'Lolos Interview (Naitei)', label: lang === 'ja' ? '5. 内定獲得' : '5. Lolos Naitei', color: 'border-emerald-500 bg-emerald-50/50 text-emerald-900', desc: lang === 'ja' ? '内定獲得済' : 'Resmi diterima (Naitei)' },
+              { status: 'Proses Visa / COE', label: lang === 'ja' ? '6. ビザ・COE' : '6. Proses Visa/COE', color: 'border-teal-500 bg-teal-50/50 text-teal-900', desc: lang === 'ja' ? '在留資格・ビザ手続' : 'Pengurusan imigrasi & COE' },
+              { status: 'Status On Job (Selesai)', label: lang === 'ja' ? '7. 就業中 (完了)' : '7. On Job (Selesai)', color: 'border-green-600 bg-green-50/50 text-green-900', desc: lang === 'ja' ? '日本で就業開始' : 'Berangkat & mulai bekerja' },
+              { status: 'Cancel', label: lang === 'ja' ? '8. キャンセル' : '8. Cancel / Ditolak', color: 'border-rose-300 bg-rose-50/50 text-rose-900', desc: lang === 'ja' ? '辞退・不採用' : 'Batal atau tidak lolos' }
+            ].map((stage) => {
+              const stageCandidates = filteredCVs.filter((cv) => {
+                const s = cv.statusProgres || 'Pending Nunggu Job';
+                if (stage.status === 'Cancel') return s === 'Cancel' || s === 'Tidak Lolos Interview';
+                return s === stage.status;
+              });
+              const isOverThisStage = dragOverStageDoc === stage.status;
+
+              return (
+                <div
+                  key={stage.status}
+                  onDragOver={(e) => handleCandidateDragOver(e, stage.status)}
+                  onDragEnter={(e) => handleCandidateDragEnter(e, stage.status)}
+                  onDragLeave={(e) => handleCandidateDragLeave(e, stage.status)}
+                  onDrop={(e) => handleCandidateDrop(e, stage.status)}
+                  className={`border rounded-2xl p-2.5 flex flex-col min-h-[520px] transition-all ${
+                    isOverThisStage
+                      ? 'bg-purple-100/90 border-purple-500 ring-4 ring-purple-500/20 shadow-lg scale-[1.01]'
+                      : 'bg-slate-100/90 border-slate-200'
+                  }`}
+                >
+                  <div className={`p-2.5 rounded-xl border shadow-2xs mb-2.5 ${isOverThisStage ? 'bg-purple-200 border-purple-400' : 'bg-white border-slate-200'}`}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-xs text-slate-900">{stage.label}</span>
+                      <span className="w-5 h-5 rounded-full bg-purple-900 text-white font-mono text-[10px] font-bold flex items-center justify-center">
+                        {stageCandidates.length}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{stage.desc}</p>
+                  </div>
+
+                  <div className="space-y-2 flex-1 overflow-y-auto max-h-[620px] pr-0.5">
+                    {isOverThisStage && draggedCandidateId && (
+                      <div className="p-3 border-2 border-dashed border-purple-500 bg-purple-100/70 rounded-xl text-center text-xs font-bold text-purple-900 animate-pulse">
+                        {bilingual('Lepas untuk pindah', 'ここにドロップ')}
+                      </div>
+                    )}
+
+                    {stageCandidates.length === 0 && !isOverThisStage ? (
+                      <div className="p-4 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-[10px]">
+                        {bilingual('Tidak ada kandidat', '候補者なし')}
+                      </div>
+                    ) : (
+                      stageCandidates.map((cv) => {
+                        const candId = cv.siswaId || cv.id;
+                        return (
+                          <div
+                            key={candId}
+                            draggable={true}
+                            onDragStart={(e) => handleCandidateDragStart(e, candId)}
+                            onDragEnd={handleCandidateDragEnd}
+                            className={`p-3 rounded-xl border bg-white shadow-2xs hover:shadow-md transition-all space-y-2 cursor-grab active:cursor-grabbing select-none ${
+                              draggedCandidateId === candId ? 'opacity-40 scale-95 border-purple-400 bg-purple-50' : 'border-slate-200 hover:border-purple-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className="font-bold px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200 truncate">
+                                {cv.kategoriKandidat || 'JIS Standard'}
+                              </span>
+                              <button
+                                type="button"
+                                draggable={false}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setQuickMoveCandidate(cv);
+                                }}
+                                className="p-1 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded transition cursor-pointer"
+                                title="Pilih Tahap / Quick Move"
+                              >
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div>
+                              <h4 className="font-extrabold text-slate-900 text-xs leading-snug">
+                                {cv.namaLengkap}
+                              </h4>
+                              <p className="text-[10px] text-slate-500 font-mono">
+                                ID: {candId} • {cv.bidangKerja || 'Kaigo / SSW'}
+                              </p>
+                            </div>
+
+                            {cv.namaPerusahaanJp && (
+                              <div className="text-[10px] bg-amber-50 text-amber-900 px-2 py-1 rounded border border-amber-200 font-medium truncate">
+                                🏢 {cv.namaPerusahaanJp}
+                              </div>
+                            )}
+
+                            <div className="pt-1 flex items-center justify-between text-[10px] border-t border-slate-100">
+                              <button
+                                type="button"
+                                draggable={false}
+                                onClick={() => {
+                                  setEditingCandidate(cv);
+                                }}
+                                className="text-purple-700 font-bold hover:underline flex items-center space-x-1"
+                              >
+                                <Eye className="w-3 h-3" />
+                                <span>{lang === 'ja' ? '詳細' : 'Detail CV'}</span>
+                              </button>
+                              <span className="text-slate-400 font-mono text-[9px]">
+                                {cv.noHp || '-'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Move Modal for Candidate */}
+          {quickMoveCandidate && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-purple-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-black text-slate-900">
+                    {bilingual('Pindah Tahap Pipeline Kandidat', '候補者パイプライン移動')}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setQuickMoveCandidate(null)}
+                    className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="bg-purple-50 p-3 rounded-xl border border-purple-200">
+                  <p className="text-xs font-bold text-slate-900">{quickMoveCandidate.namaLengkap}</p>
+                  <p className="text-[10px] text-slate-600 font-mono">ID: {quickMoveCandidate.siswaId || quickMoveCandidate.id}</p>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">
+                    {bilingual('Pilih Tahapan Tujuan:', '目的のステージを選択:')}
+                  </label>
+                  <div className="grid grid-cols-1 gap-1.5 max-h-60 overflow-y-auto">
+                    {[
+                      'Nihongo check',
+                      'Pending Nunggu Job',
+                      'Terjadwal Interview',
+                      'On Proses',
+                      'Lolos Interview (Naitei)',
+                      'Proses Visa / COE',
+                      'Status On Job (Selesai)',
+                      'Cancel'
+                    ].map((stageKey) => (
+                      <button
+                        key={stageKey}
+                        type="button"
+                        onClick={() => handleCandidateStageMove(quickMoveCandidate.siswaId || quickMoveCandidate.id!, stageKey)}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between ${
+                          (quickMoveCandidate.statusProgres || 'Pending Nunggu Job') === stageKey
+                            ? 'bg-purple-600 text-white shadow-sm'
+                            : 'bg-slate-100 hover:bg-purple-100 text-slate-800'
+                        }`}
+                      >
+                        <span>{stageKey}</span>
+                        {(quickMoveCandidate.statusProgres || 'Pending Nunggu Job') === stageKey && (
+                          <CheckCircle2 className="w-4 h-4 text-white" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* TAB 1: DATA KANDIDAT CV RIREKISHO */}
       {activeTab === 'kandidat' && (
