@@ -52,7 +52,8 @@ import {
   Copy,
   AlertTriangle,
   Shield,
-  RotateCcw
+  RotateCcw,
+  GripVertical
 } from 'lucide-react';
 
 export const StudentMasterView: React.FC = () => {

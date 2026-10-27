@@ -121,7 +121,8 @@ import {
   LogIn,
   ArrowUpDown,
   Stethoscope,
-  Brain
+  Brain,
+  GripVertical
 } from 'lucide-react';
 
 const MONTH_NAMES_ID = [
