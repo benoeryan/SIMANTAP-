@@ -2615,12 +2615,13 @@ export const Admin2CVPortalView: React.FC = () => {
       {/* Global Firebase Real-Time Synchronization & Auto-Update Control Bar */}
       <FirebaseSyncControlBar domain="all" variant="card" showCounters={true} />
 
-      {/* Global Firebase Real-Time Synchronization & Auto-Update Control Bar */}
-      <FirebaseSyncControlBar domain="all" variant="card" showCounters={true} />
-
       {/* TAB KANBAN PIPELINE ADMIN DOC */}
       {activeTab === 'pipeline' && (
         <div className="space-y-4">
+          {(() => {
+            const kanbanCandidates = rirekishoList;
+            return (
+              <>
           <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-amber-50 border border-purple-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center space-x-3 text-xs text-slate-800">
               <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -2639,31 +2640,8 @@ export const Admin2CVPortalView: React.FC = () => {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <div className="flex items-center space-x-1.5 bg-white border border-purple-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold shadow-2xs">
-                <Search className="w-3.5 h-3.5 text-purple-600" />
-                <input
-                  type="text"
-                  placeholder={bilingual('Cari kandidat di pipeline...', '候補者を検索...')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-transparent text-xs focus:outline-none w-36 sm:w-48"
-                />
-              </div>
-
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-white border border-purple-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold shadow-2xs focus:outline-none cursor-pointer"
-              >
-                <option value="Semua">{bilingual('Semua Kategori', '全カテゴリー')}</option>
-                <option value="SISWA IJEF - Offline">SISWA IJEF - Offline</option>
-                <option value="SISWA IJEF - Online">SISWA IJEF - Online</option>
-                <option value="SISWA NON IJEF (New Comer)">SISWA NON IJEF</option>
-                <option value="SISWA MITRA / NON IJEF">SISWA MITRA</option>
-              </select>
-
               <div className="text-xs font-bold text-purple-900 bg-white px-3 py-1.5 rounded-xl border border-purple-200 shadow-2xs">
-                ✨ {filteredCVs.length} {bilingual('Kandidat Aktif', '候補者')}
+                ✨ {kanbanCandidates.length} {bilingual('Kandidat Terdaftar', '登録候補者')}
               </div>
             </div>
           </div>
@@ -2679,7 +2657,7 @@ export const Admin2CVPortalView: React.FC = () => {
               { status: 'Status On Job (Selesai)', label: lang === 'ja' ? '7. 就業中 (完了)' : '7. On Job (Selesai)', color: 'border-green-600 bg-green-50/50 text-green-900', desc: lang === 'ja' ? '日本で就業開始' : 'Berangkat & mulai bekerja' },
               { status: 'Cancel', label: lang === 'ja' ? '8. キャンセル' : '8. Cancel / Ditolak', color: 'border-rose-300 bg-rose-50/50 text-rose-900', desc: lang === 'ja' ? '辞退・不採用' : 'Batal atau tidak lolos' }
             ].map((stage) => {
-              const stageCandidates = filteredCVs.filter((cv) => {
+              const stageCandidates = kanbanCandidates.filter((cv) => {
                 const s = cv.statusProgres || 'Pending Nunggu Job';
                 if (stage.status === 'Cancel') return s === 'Cancel' || s === 'Tidak Lolos Interview';
                 return s === stage.status;
@@ -2848,6 +2826,9 @@ export const Admin2CVPortalView: React.FC = () => {
               </div>
             </div>
           )}
+              </>
+            );
+          })()}
         </div>
       )}
 
