@@ -34,6 +34,7 @@ import {
   fetchStudentsFromFirestore,
   fetchJobPostingsFromFirestore
 } from '../lib/firebase';
+import { saveSiswaToSupabase } from '../lib/supabase';
 import {
   INITIAL_LEADS,
   INITIAL_CAMPAIGNS,
@@ -484,6 +485,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const saveRirekishoRecord = (record: CVRirekisho) => {
     setRirekishoRecords(prev => ({ ...prev, [record.siswaId || record.id]: record }));
+    try {
+      saveSiswaToSupabase(record).catch((err) => console.error('Supabase save error:', err));
+    } catch (e) {}
   };
 
   const deleteRirekishoRecord = (id: string) => {
