@@ -25,7 +25,7 @@ import { formatRupiah } from '../../utils/financingCalculator';
 import { getStudentPhotoUrl, handleStudentImageError } from '../../utils/studentPhotoHelper';
 import { StudentPhotoBadge } from '../StudentPhotoBadge';
 import { JobDescriptionCategorizedView } from '../common/JobDescriptionCategorizedView';
-import { detectDuplicates, cvToUnified } from '../../utils/duplicateDetector';
+import { detectDuplicates, cvToUnified, deduplicateAndMergeCandidates } from '../../utils/duplicateDetector';
 import {
   getSanitizedJobTitle,
   getSanitizedCompany,
@@ -810,7 +810,8 @@ export const Admin2CVPortalView: React.FC = () => {
         uniqueMap.set(key, cv);
       }
     });
-    return Array.from(uniqueMap.values());
+    const list = Array.from(uniqueMap.values());
+    return deduplicateAndMergeCandidates(list);
   }, [rirekishoRecords]);
 
   // Date parsing utility for tanggalSubmit
