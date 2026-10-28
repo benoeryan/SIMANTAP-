@@ -34,7 +34,7 @@ import {
   fetchStudentsFromFirestore,
   fetchJobPostingsFromFirestore
 } from '../lib/firebase';
-import { saveSiswaToSupabase } from '../lib/supabase';
+import { saveSiswaToSupabase, fetchSiswaFromSupabase } from '../lib/supabase';
 import { deduplicateAndMergeCandidates } from '../utils/duplicateDetector';
 import {
   INITIAL_LEADS,
@@ -576,254 +576,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return Array.from(map.values());
   }
 
-  const syncFirebaseDomain = async () => {
+  const syncSupabaseDomain = async () => {
     try {
-      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: true, lastMessage: 'Menghubungkan & Menarik Data dari Firebase Firestore...' }));
-      const [candRes, studRes, jobRes] = await Promise.all([
-        fetchCandidatesFromFirestore(),
-        fetchStudentsFromFirestore(),
-        fetchJobPostingsFromFirestore()
-      ]);
-
-      const baseMap = new Map<string, CalonSiswa>();
-      students.forEach(s => {
-        if (s && s.id) baseMap.set(s.id, s);
-      });
-
-      if (studRes.success && studRes.data && studRes.data.length > 0) {
-        studRes.data.forEach((s: any) => {
-          if (!s || !s.id) return;
-          const existing = baseMap.get(s.id);
-          const sPhoto = extractPhotoUrl(s) || existing?.pasPhoto || '';
-          const sGender = extractNormalizedGender(s) || extractNormalizedGender(existing);
-          baseMap.set(s.id, {
-            ...(existing || {}),
-            ...s,
-            jenisKelamin: sGender,
-            pasPhoto: sPhoto,
-            berkasDokumen: {
-              ...(existing?.berkasDokumen || {}),
-              ...(s.berkasDokumen || {}),
-              ...(sPhoto ? { pasFoto: sPhoto } : {})
-            }
-          });
-        });
-      }
-
-      if (candRes.success && candRes.data && candRes.data.length > 0) {
-        candRes.data.forEach((c: any) => {
-          if (!c) return;
-          const sId = c.siswaId || c.id;
-          const cEmail = (c.email || '').trim().toLowerCase();
-          const cKtp = (c.noKtp || c.nik || '').trim();
-          const cName = (c.namaLengkap || '').trim().toLowerCase();
-          const cGender = extractNormalizedGender(c);
-
-          let foundKey: string | null = null;
-          for (const [k, item] of baseMap.entries()) {
-            if (k === sId || k === c.id) { foundKey = k; break; }
-            if (cEmail && cEmail !== '-' && !cEmail.includes('@example.com') && item.email && item.email.trim().toLowerCase() === cEmail) { foundKey = k; break; }
-            if (cKtp && cKtp !== '-' && item.noKtp && item.noKtp.trim() === cKtp) { foundKey = k; break; }
-            if (cName && cName !== '-' && cName !== 'kandidat firebase' && item.namaLengkap && item.namaLengkap.trim().toLowerCase() === cName) { foundKey = k; break; }
-          }
-
-          const photoUrl = extractPhotoUrl(c);
-          if (foundKey) {
-            const existing = baseMap.get(foundKey)!;
-            const resolvedPhoto = photoUrl || existing.berkasDokumen?.pasFoto || existing.pasPhoto || '';
-            baseMap.set(foundKey, {
-              ...existing,
-              namaLengkap: c.namaLengkap || existing.namaLengkap,
-              jenisKelamin: cGender || existing.jenisKelamin,
-              noKtp: c.noKtp || c.nik || existing.noKtp,
-              alamatDomisili: c.alamatDomisili || c.alamat || existing.alamatDomisili,
-              email: c.email || existing.email,
-              noHp: c.noHp || existing.noHp,
-              kategoriKandidat: c.kategoriKandidat || existing.kategoriKandidat,
-              pasPhoto: resolvedPhoto,
-              berkasDokumen: {
-                ...(existing.berkasDokumen || {}),
-                ...(resolvedPhoto ? { pasFoto: resolvedPhoto } : {})
-              }
-            });
-          } else {
-            baseMap.set(sId, {
-              id: sId,
-              namaLengkap: c.namaLengkap || 'Kandidat Firebase',
-              email: c.email || '',
-              noHp: c.noHp || '',
-              jenisKelamin: cGender,
-              noKtp: c.noKtp || c.nik || '',
-              alamatDomisili: c.alamatDomisili || c.alamat || '',
-              kategoriKandidat: c.kategoriKandidat || 'SISWA NON IJEF (New Comer)',
-              berkasDokumen: {
-                ...(photoUrl ? { pasFoto: photoUrl } : {})
-              },
-              pasPhoto: photoUrl,
-              statusPendaftaran: 'Terverifikasi',
-              createdAt: c.createdAt || c.submittedAt || new Date().toISOString()
-            } as any);
-          }
-        });
-      }
-
-      const updatedStudents = Array.from(baseMap.values());
-      const cleanStudents = deduplicateStudents(updatedStudents);
-      setStudents(cleanStudents);
-      if (studRes.success && studRes.data && studRes.data.length > 0) {
-        studRes.data.forEach((s: any) => {
-          const sPhoto = s.berkasDokumen?.pasFoto || s.berkasDokumen?.pasPhoto || s.pasPhoto || s.pasFoto || s.pasFotoUrl || '';
-          const idx = updatedStudents.findIndex(item => item.id === s.id);
-          if (idx >= 0) {
-            const existing = updatedStudents[idx];
-            const finalPhoto = sPhoto || existing.berkasDokumen?.pasFoto || (existing as any).pasPhoto || (existing as any).pasFoto || '';
-            updatedStudents[idx] = {
-              ...existing,
-              ...s,
-              berkasDokumen: {
-                ...(existing.berkasDokumen || {}),
-                ...(s.berkasDokumen || {}),
-                ...(finalPhoto ? { pasFoto: finalPhoto } : {})
-              },
-              pasPhoto: finalPhoto,
-              pasFoto: finalPhoto
-            };
-          } else {
-            updatedStudents.push({
-              ...s,
-              berkasDokumen: {
-                ...(s.berkasDokumen || {}),
-                ...(sPhoto ? { pasFoto: sPhoto } : {})
-              },
-              pasPhoto: sPhoto,
-              pasFoto: sPhoto
-            });
-          }
-        });
-      }
-      if (candRes.success && candRes.data && candRes.data.length > 0) {
-        candRes.data.forEach((c: any) => {
-          const sId = c.siswaId || c.id;
-          const photoUrl = c.pasPhoto || c.pasFoto || c.pasFotoUrl || c.fotoUrl || c.photoUrl || c.berkasDokumen?.pasFoto || '';
-          const idx = updatedStudents.findIndex(item => item.id === sId);
-          if (idx >= 0) {
-            const existing = updatedStudents[idx];
-            const resolvedPhoto = photoUrl || existing.berkasDokumen?.pasFoto || (existing as any).pasPhoto || (existing as any).pasFoto || '';
-            updatedStudents[idx] = {
-              ...existing,
-              namaLengkap: c.namaLengkap || existing.namaLengkap,
-              berkasDokumen: {
-                ...(existing.berkasDokumen || {}),
-                ...(resolvedPhoto ? { pasFoto: resolvedPhoto } : {})
-              },
-              pasPhoto: resolvedPhoto,
-              pasFoto: resolvedPhoto,
-              email: c.email || existing.email,
-              noHp: c.noHp || existing.noHp,
-              kategoriKandidat: c.kategoriKandidat || existing.kategoriKandidat
-            };
-          } else {
-            updatedStudents.push({
-              id: sId,
-              namaLengkap: c.namaLengkap || 'Kandidat Firebase',
-              email: c.email || '',
-              noHp: c.noHp || '',
-              kategoriKandidat: c.kategoriKandidat || 'SISWA NON IJEF (New Comer)',
-              berkasDokumen: {
-                ...(photoUrl ? { pasFoto: photoUrl } : {})
-              },
-              pasPhoto: photoUrl,
-              pasFoto: photoUrl,
-              statusPendaftaran: 'Terverifikasi',
-              createdAt: c.createdAt || c.submittedAt || new Date().toISOString()
-            } as any);
-          }
-        });
-      }
-
-      if (updatedStudents.length > 0) {
-        const cleanStudents = deduplicateStudents(updatedStudents);
+      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: true, lastMessage: 'Menghubungkan & Menarik Data dari Supabase Database...' }));
+      const res = await fetchSiswaFromSupabase();
+      if (res.success && res.students && res.students.length > 0) {
+        const cleanStudents = deduplicateAndMergeCandidates(res.students);
         setStudents(cleanStudents);
-        setLeads(prevLeads => {
-          const leadMap = new Map<string, MarketingLead>();
-          prevLeads.forEach(l => leadMap.set(l.id, l));
-          cleanStudents.forEach(s => {
-            const leadId = `LEAD-STD-${s.id}`;
-            if (!leadMap.has(leadId)) {
-              leadMap.set(leadId, normalizeLeadData({
-                id: leadId,
-                namaLengkap: s.namaLengkap,
-                noWhatsapp: s.noHp || '-',
-                email: s.email || `${s.id.toLowerCase()}@example.com`,
-                kotaDomisili: s.alamatDomisili || '-',
-                statusLead: 'DEAL_TERDAFTAR',
-                programDiminati: s.kategoriKandidat || 'SISWA IJEF - Offline',
-                sumberLead: 'Firebase Firestore',
-                createdAt: s.createdAt || new Date().toISOString()
-              } as any));
-            } else {
-              const existing = leadMap.get(leadId)!;
-              leadMap.set(leadId, {
-                ...existing,
-                namaLengkap: s.namaLengkap || existing.namaLengkap,
-                noWhatsapp: s.noHp || existing.noWhatsapp,
-                email: s.email || existing.email
-              });
-            }
-          });
-          return Array.from(leadMap.values());
-        });
+        if (res.cvMap && Object.keys(res.cvMap).length > 0) {
+          setRirekishoRecords(res.cvMap);
+        }
+        setFirebaseSyncStatus(prev => ({
+          ...prev,
+          isConnected: true,
+          isSyncing: false,
+          lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+          counts: {
+            ...prev.counts,
+            students: cleanStudents.length
+          },
+          lastMessage: 'Sinkronisasi data Supabase Database berhasil (Total: ' + cleanStudents.length + ' kandidat unik).'
+        }));
+        return { success: true, count: cleanStudents.length };
+      } else {
+        const backup = parseBackupCandidates();
+        const cleanStudents = deduplicateAndMergeCandidates(backup.calonSiswaList);
+        setStudents(cleanStudents);
+        setRirekishoRecords(backup.rirekishoMap);
+        setFirebaseSyncStatus(prev => ({
+          ...prev,
+          isConnected: true,
+          isSyncing: false,
+          lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+          counts: { ...prev.counts, students: cleanStudents.length },
+          lastMessage: 'Sinkronisasi menggunakan data lokal terstandarisasi Supabase.'
+        }));
+        return { success: true, count: cleanStudents.length };
       }
-
-      if (jobRes.success && jobRes.data && jobRes.data.length > 0) {
-        setJobPostings(jobRes.data);
-      }
-
-      if (candRes.success && candRes.data && candRes.data.length > 0) {
-        setRirekishoRecords(prev => {
-          const cvMap: Record<string, CVRirekisho> = { ...prev };
-          candRes.data.forEach((cv: any) => {
-            const key = cv.siswaId || cv.id;
-            const parsed = parseCandidateFromFirestore(key, cv);
-            const photo = cv.pasPhoto || cv.pasFotoUrl || cv.pasFoto || cv.fotoUrl || cv.photoUrl || parsed?.pasFotoUrl || cvMap[key]?.pasFotoUrl || cvMap[key]?.pasPhoto || '';
-            cvMap[key] = {
-              ...(cvMap[key] || {}),
-              ...cv,
-              ...(parsed || {}),
-              pasPhoto: photo,
-              pasFoto: photo,
-              pasFotoUrl: photo
-            };
-          });
-          return cvMap;
-        });
-      }
-
-      setFirebaseSyncStatus(prev => ({
-        ...prev,
-        isConnected: true,
-        isSyncing: false,
-        lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-        counts: {
-          ...prev.counts,
-          students: updatedStudents.length,
-          jobs: jobRes.success ? jobRes.data.length : prev.counts.jobs
-        },
-        lastMessage: 'Sinkronisasi data Firebase Firestore berhasil!'
-      }));
-      return { success: true, count: updatedStudents.length };
     } catch (err: any) {
-      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: false, lastMessage: 'Gagal sinkronisasi: ' + (err?.message || err) }));
+      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: false, lastMessage: 'Gagal sinkronisasi Supabase: ' + (err?.message || err) }));
       return { success: false, error: err?.message };
     }
   };
 
+  const syncFirebaseDomain = async () => {
+    return await syncSupabaseDomain();
+  };
+
   const refreshFirebaseDomain = async () => {
-    return await syncFirebaseDomain();
+    return await syncSupabaseDomain();
   };
 
   React.useEffect(() => {
-    syncFirebaseDomain();
+    syncSupabaseDomain();
   }, []);
   const saveMitraOrganization = async (m: any) => ({ success: true, id: m.id });
   const deleteMitraOrganization = async () => ({ success: true });
