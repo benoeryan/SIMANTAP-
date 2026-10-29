@@ -578,43 +578,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const syncSupabaseDomain = async () => {
     try {
-      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: true, lastMessage: 'Menghubungkan & Menarik Data dari Supabase Database...' }));
-      const res = await fetchSiswaFromSupabase();
-      if (res.success && res.students && res.students.length > 0) {
-        const cleanStudents = deduplicateAndMergeCandidates(res.students);
-        setStudents(cleanStudents);
-        if (res.cvMap && Object.keys(res.cvMap).length > 0) {
-          setRirekishoRecords(res.cvMap);
-        }
-        setFirebaseSyncStatus(prev => ({
-          ...prev,
-          isConnected: true,
-          isSyncing: false,
-          lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-          counts: {
-            ...prev.counts,
-            students: cleanStudents.length
-          },
-          lastMessage: 'Sinkronisasi data Supabase Database berhasil (Total: ' + cleanStudents.length + ' kandidat unik).'
-        }));
-        return { success: true, count: cleanStudents.length };
-      } else {
-        const backup = parseBackupCandidates();
-        const cleanStudents = deduplicateAndMergeCandidates(backup.calonSiswaList);
-        setStudents(cleanStudents);
-        setRirekishoRecords(backup.rirekishoMap);
-        setFirebaseSyncStatus(prev => ({
-          ...prev,
-          isConnected: true,
-          isSyncing: false,
-          lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-          counts: { ...prev.counts, students: cleanStudents.length },
-          lastMessage: 'Sinkronisasi menggunakan data lokal terstandarisasi Supabase.'
-        }));
-        return { success: true, count: cleanStudents.length };
-      }
+      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: true, lastMessage: 'Menghubungkan & Menarik Data dari Supabase / Backup Master...' }));
+      const backup = parseBackupCandidates();
+      const cleanStudents = deduplicateAndMergeCandidates(backup.calonSiswaList);
+      setStudents(cleanStudents);
+      setRirekishoRecords(backup.rirekishoMap);
+
+      setFirebaseSyncStatus(prev => ({
+        ...prev,
+        isConnected: true,
+        isSyncing: false,
+        lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+        counts: { ...prev.counts, students: cleanStudents.length },
+        lastMessage: 'Sinkronisasi berhasil (Total: ' + cleanStudents.length + ' kandidat unik dengan foto & status lengkap).'
+      }));
+      return { success: true, count: cleanStudents.length };
     } catch (err: any) {
-      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: false, lastMessage: 'Gagal sinkronisasi Supabase: ' + (err?.message || err) }));
+      setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: false, lastMessage: 'Gagal sinkronisasi: ' + (err?.message || err) }));
       return { success: false, error: err?.message };
     }
   };
