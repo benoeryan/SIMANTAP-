@@ -55,18 +55,34 @@ export function mapCategory(rawCat?: any): CandidateCategory {
 
 export function extractPhotoUrl(raw: any): string {
   if (!raw || typeof raw !== 'object') return '';
-  const berkas = raw.berkasDokumen || {};
-  const dok = raw.dokumenUpload || {};
+  const berkas = raw.berkasDokumen || raw.berkas_dokumen || {};
+  const dok = raw.dokumenUpload || raw.dokumen_upload || {};
   const list = [
     raw.pasPhoto,
     raw.pasFoto,
     raw.pasFotoUrl,
+    raw.pas_foto,
+    raw.pas_photo,
     raw.fotoUrl,
     raw.photoUrl,
+    raw.foto_url,
+    raw.photo_url,
+    raw.url_foto,
+    raw.foto,
+    raw.photo,
+    raw.avatar,
+    raw.image_url,
+    raw.imageUrl,
     berkas.pasFoto,
-    berkas.pasPhoto,
+    berkas.pasFoto,
+    berkas.pas_foto,
+    berkas.pas_photo,
+    berkas.foto,
+    berkas.photo,
     dok.pasPhoto,
     dok.pasFoto,
+    dok.pas_foto,
+    dok.pas_photo,
     dok.pasPhoto3x4
   ];
   for (const item of list) {
