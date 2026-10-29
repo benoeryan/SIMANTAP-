@@ -446,7 +446,12 @@ export const StudentCardView: React.FC<StudentCardViewProps> = ({
         const sPsikotes = psikotesRecords[student.id];
         const sDana = financingRecords[student.id];
         const sKontrak = contractRecords[student.id];
-        const isForwarded = student.statusPendaftaran === 'Diterima' || !!rirekishoRecords[student.id];
+        const rirekisho = rirekishoRecords[student.id] || Object.values(rirekishoRecords).find(r =>
+          (student.noKtp && r.noKtp && r.noKtp === student.noKtp) ||
+          (student.email && r.email && r.email.toLowerCase() === student.email.toLowerCase()) ||
+          (student.namaLengkap && r.namaLengkap && r.namaLengkap.trim().toUpperCase() === student.namaLengkap.trim().toUpperCase())
+        );
+        const isForwarded = student.statusPendaftaran === 'Diterima' || !!rirekisho;
 
         // Format Financing Label
         let danaLabel = lang === 'ja' ? '未登録' : 'Belum Ada';

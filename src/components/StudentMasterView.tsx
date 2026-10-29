@@ -227,6 +227,15 @@ export const StudentMasterView: React.FC = () => {
   }, [isFilterLocked, searchTerm, sourceFilter, sortBy, categoryFilter, statusFilter, genderFilter, mcuAssessmentFilter]);
 
   // Check if any non-default filter is currently applied
+  const getRirekisho = React.useCallback((s: CalonSiswa | null | undefined) => {
+    if (!s) return undefined;
+    return rirekishoRecords[s.id] || Object.values(rirekishoRecords).find(r =>
+      (s.noKtp && r.noKtp && r.noKtp === s.noKtp) ||
+      (s.email && r.email && r.email.toLowerCase() === s.email.toLowerCase()) ||
+      (s.namaLengkap && r.namaLengkap && r.namaLengkap.trim().toUpperCase() === s.namaLengkap.trim().toUpperCase())
+    );
+  }, [rirekishoRecords]);
+
   const isAnyFilterActive =
     Boolean(searchTerm && searchTerm.trim()) ||
     categoryFilter !== 'ALL' ||
