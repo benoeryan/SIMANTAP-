@@ -433,7 +433,7 @@ Kembalikan jawaban HANYA dalam format JSON valid tanpa tanda markdown tambahan:
         }
 
         if (fileId) {
-          targetUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+          targetUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
         }
       }
 
