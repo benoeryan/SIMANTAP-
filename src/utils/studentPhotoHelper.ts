@@ -65,8 +65,8 @@ export function normalizeDisplayImageUrl(rawUrl?: string | null): string {
     }
 
     if (fileId) {
-      // Google Drive thumbnail endpoint reliably outputs image/jpeg or image/png
-      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+      // Google Drive direct image CDN URL reliably outputs image without 403 blocks
+      return `https://lh3.googleusercontent.com/d/${fileId}`;
     }
   }
 
