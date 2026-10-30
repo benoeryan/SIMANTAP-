@@ -65,8 +65,8 @@ export function normalizeDisplayImageUrl(rawUrl?: string | null): string {
     }
 
     if (fileId) {
-      // Google Drive direct image CDN URL reliably outputs image without 403 blocks
-      return `https://lh3.googleusercontent.com/d/${fileId}`;
+      // Route through resilient server-side proxy endpoint to bypass Google Drive 403 / CORS restrictions
+      return `/api/proxy-image?url=${encodeURIComponent(trimmed)}`;
     }
   }
 
