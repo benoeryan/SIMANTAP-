@@ -1,11 +1,11 @@
 {
-  "projectId": "test-kesehatan-ijef-corp-7c278",
-  "appId": "1:48180557823:web:47ea8db8126737dbc0d9ca",
-  "apiKey": "AIzaSyAWlNi_iBOWxZBD6E20aHOSrRpPsirDdOM",
-  "authDomain": "test-kesehatan-ijef-corp-7c278.firebaseapp.com",
-  "storageBucket": "test-kesehatan-ijef-corp-7c278.firebasestorage.app",
-  "messagingSenderId": "48180557823",
-  "measurementId": "G-KP414T146X",
+  "projectId": "simantap-ijef",
+  "appId": "1:770616748921:web:a1f198f006d95f8f589da8",
+  "apiKey": "AIzaSyBPL7vthHw3FSMOu_R-b88y4WwbYoJAo3A",
+  "authDomain": "simantap-ijef.firebaseapp.com",
+  "storageBucket": "simantap-ijef.firebasestorage.app",
+  "messagingSenderId": "770616748921",
+  "measurementId": "",
   "oAuthClientId": "",
   "recaptchaSiteKey": ""
 }
