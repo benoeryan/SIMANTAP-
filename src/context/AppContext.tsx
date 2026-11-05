@@ -176,16 +176,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         studentMap.set(s.id, s);
       }
     });
-    if (studentMap.size === 0) {
-      INITIAL_STUDENTS.forEach(s => studentMap.set(s.id, s));
-      DRIVE_GRADUATES_LIST.forEach(g => {
-        if (g.student && g.student.id) {
-          studentMap.set(g.student.id, g.student);
-        }
-      });
-    }
+    INITIAL_STUDENTS.forEach(s => {
+      if (s && s.id && !studentMap.has(s.id)) {
+        studentMap.set(s.id, s);
+      }
+    });
+    DRIVE_GRADUATES_LIST.forEach(g => {
+      if (g.student && g.student.id && !studentMap.has(g.student.id)) {
+        studentMap.set(g.student.id, g.student);
+      }
+    });
     const rawList = Array.from(studentMap.values());
-    return deduplicateAndMergeCandidates(rawList);
+    return rawList;
   });
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(() => {
@@ -205,20 +207,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     for (const [k, v] of Object.entries(backup.rirekishoMap)) {
       defaultMap[k] = v;
     }
-    if (Object.keys(defaultMap).length === 0) {
-      INITIAL_RIREKISHO.forEach(cv => {
-        defaultMap[cv.siswaId || cv.id] = cv;
-      });
-      DRIVE_GRADUATES_LIST.forEach(g => {
-        if (g.cv && (g.cv.siswaId || g.cv.id)) {
-          defaultMap[g.cv.siswaId || g.cv.id] = g.cv;
+    INITIAL_RIREKISHO.forEach(cv => {
+      const key = cv.siswaId || cv.id;
+      if (key && !defaultMap[key]) {
+        defaultMap[key] = cv;
+      }
+    });
+    DRIVE_GRADUATES_LIST.forEach(g => {
+      if (g.cv && (g.cv.siswaId || g.cv.id)) {
+        const key = g.cv.siswaId || g.cv.id;
+        if (!defaultMap[key]) {
+          defaultMap[key] = g.cv;
         }
-      });
-    }
+      }
+    });
     const rawList = Object.values(defaultMap) as CVRirekisho[];
-    const uniqueList = deduplicateAndMergeCandidates(rawList);
     const cleanMap: Record<string, CVRirekisho> = {};
-    uniqueList.forEach(cv => {
+    rawList.forEach(cv => {
       cleanMap[cv.siswaId || cv.id] = cv;
     });
     return cleanMap;
@@ -580,19 +585,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: true, lastMessage: 'Menghubungkan & Menarik Data dari Supabase / Backup Master...' }));
       const backup = parseBackupCandidates();
-      const cleanStudents = deduplicateAndMergeCandidates(backup.calonSiswaList);
-      setStudents(cleanStudents);
-      setRirekishoRecords(backup.rirekishoMap);
+      const cleanStudents = backup.calonSiswaList;
+      setStudents(prev => {
+        const map = new Map<string, CalonSiswa>();
+        prev.forEach(s => { if (s && s.id) map.set(s.id, s); });
+        cleanStudents.forEach(s => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
+        return Array.from(map.values());
+      });
+      setRirekishoRecords(prev => ({ ...prev, ...backup.rirekishoMap }));
+
+      const totalCandidateCount = Object.keys(backup.rirekishoMap).length || cleanStudents.length;
 
       setFirebaseSyncStatus(prev => ({
         ...prev,
         isConnected: true,
         isSyncing: false,
         lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-        counts: { ...prev.counts, students: cleanStudents.length },
-        lastMessage: 'Sinkronisasi berhasil (Total: ' + cleanStudents.length + ' kandidat unik dengan foto & status lengkap).'
+        counts: { ...prev.counts, students: totalCandidateCount },
+        lastMessage: 'Sinkronisasi berhasil (Total: ' + totalCandidateCount + ' kandidat dengan foto & status lengkap).'
       }));
-      return { success: true, count: cleanStudents.length };
+      return { success: true, count: totalCandidateCount };
     } catch (err: any) {
       setFirebaseSyncStatus(prev => ({ ...prev, isSyncing: false, lastMessage: 'Gagal sinkronisasi: ' + (err?.message || err) }));
       return { success: false, error: err?.message };

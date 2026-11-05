@@ -2061,9 +2061,14 @@ export const Admin2CVPortalView: React.FC = () => {
         const res = await fetchSiswaFromSupabase();
         if (res.success && res.students && res.students.length > 0) {
           console.log(`[Supabase Admin Dashboard] Memuat ${res.students.length} data siswa dari tabel siswa`);
-          setStudents(res.students);
+          setStudents((prev) => {
+            const map = new Map<string, any>();
+            prev.forEach((s) => { if (s && s.id) map.set(s.id, s); });
+            res.students.forEach((s: any) => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
+            return Array.from(map.values());
+          });
           if (res.cvMap && Object.keys(res.cvMap).length > 0) {
-            setRirekishoRecords(res.cvMap);
+            setRirekishoRecords((prev) => ({ ...prev, ...res.cvMap }));
           }
         }
       } catch (err) {
@@ -2081,14 +2086,19 @@ export const Admin2CVPortalView: React.FC = () => {
     try {
       const spRes = await fetchSiswaFromSupabase();
       if (spRes.success && spRes.students && spRes.students.length > 0) {
-        setStudents(spRes.students);
+        setStudents((prev) => {
+          const map = new Map<string, any>();
+          prev.forEach((s) => { if (s && s.id) map.set(s.id, s); });
+          spRes.students.forEach((s: any) => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
+          return Array.from(map.values());
+        });
         if (spRes.cvMap && Object.keys(spRes.cvMap).length > 0) {
-          setRirekishoRecords(spRes.cvMap);
+          setRirekishoRecords((prev) => ({ ...prev, ...spRes.cvMap }));
         }
       }
       const res = await refreshFirebaseDomain('all');
       setIsSyncing(false);
-      const totalCount = spRes.count || res?.count || rirekishoList.length;
+      const totalCount = rirekishoList.length;
       setToastMessage(
         lang === 'ja'
           ? `Supabaseデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
