@@ -13,8 +13,14 @@ import {
   ShieldCheck,
   Radio,
   Sparkles,
-  ArrowUpDown
+  ArrowUpDown,
+  Download
 } from 'lucide-react';
+import {
+  downloadSystemBackupFile,
+  performDailyAutoBackup,
+  getTodayDateString
+} from '../../utils/autoBackupHelper';
 
 interface FirebaseSyncControlBarProps {
   domain?: 'all' | 'mitra' | 'students' | 'admins' | 'jobs';
@@ -29,8 +35,47 @@ export const FirebaseSyncControlBar: React.FC<FirebaseSyncControlBarProps> = ({
   showCounters = true,
   className = ''
 }) => {
-  const { firebaseSyncStatus, syncFirebaseDomain, refreshFirebaseDomain, lang = 'id' } = useApp();
+  const {
+    students = [],
+    rirekishoRecords = {},
+    jobPostings = [],
+    masterSettings,
+    leads = [],
+    firebaseSyncStatus,
+    syncFirebaseDomain,
+    refreshFirebaseDomain,
+    lang = 'id'
+  } = useApp();
+
   const [localFeedback, setLocalFeedback] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Trigger daily auto-backup snapshot
+  React.useEffect(() => {
+    if (students.length > 0 || Object.keys(rirekishoRecords).length > 0) {
+      performDailyAutoBackup({
+        candidates: Object.values(rirekishoRecords),
+        students,
+        jobs: jobPostings,
+        admins: masterSettings?.adminUsers || [],
+        leads,
+        masterSettings
+      });
+    }
+  }, [students, rirekishoRecords, jobPostings, leads, masterSettings]);
+
+  const handleDownloadBackup = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    downloadSystemBackupFile({
+      candidates: Object.values(rirekishoRecords),
+      students,
+      jobs: jobPostings,
+      admins: masterSettings?.adminUsers || [],
+      leads,
+      masterSettings
+    });
+    setLocalFeedback({ text: `File backup harian (JSON) untuk tanggal ${getTodayDateString()} berhasil diunduh!`, type: 'success' });
+    setTimeout(() => setLocalFeedback(null), 4000);
+  };
 
   const domainNames = {
     all: lang === 'ja' ? '全ドメイン（提携先、生徒、管理者、求人）' : 'Semua Domain (Mitra, Siswa, Admin, Jobs)',
@@ -222,6 +267,17 @@ export const FirebaseSyncControlBar: React.FC<FirebaseSyncControlBarProps> = ({
           >
             <RefreshCw className={`w-4 h-4 text-emerald-400 ${isCurrentDomainSyncing ? 'animate-spin' : ''}`} />
             <span>{lang === 'ja' ? '更新' : 'Refresh Data'}</span>
+          </button>
+
+          <button
+            id={`btn-card-download-backup-${domain}`}
+            type="button"
+            onClick={handleDownloadBackup}
+            className="flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-indigo-900/80 hover:bg-indigo-800 text-indigo-100 border border-indigo-700/60 transition-all active:scale-95 shadow-md"
+            title={lang === 'ja' ? '全マスターバックアップ（JSON）をダウンロード' : 'Unduh file cadangan otomatis harian (JSON)'}
+          >
+            <Download className="w-4 h-4 text-indigo-300" />
+            <span>{lang === 'ja' ? 'バックアップDL' : 'Download Backup (JSON)'}</span>
           </button>
         </div>
       </div>
