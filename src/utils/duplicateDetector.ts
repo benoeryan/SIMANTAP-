@@ -247,14 +247,7 @@ export function deduplicateAndMergeCandidates<T extends { namaLengkap?: string; 
     const email = normalizeEmail(item.email);
     const ktp = normalizeNik(item.noKtp);
 
-    let key = `NAME:${normName}`;
-    if (ktp && ktp.length >= 10) {
-      key = `NIK:${ktp}`;
-    } else if (email && email.length >= 5 && !email.includes('example.com') && !email.includes('dummy')) {
-      key = `EMAIL:${email}`;
-    } else if (phone && phone.length >= 8) {
-      key = `PHONE:${phone}`;
-    }
+    const key = `NAME:${normName}`;
 
     if (!map.has(key)) {
       map.set(key, { ...item });

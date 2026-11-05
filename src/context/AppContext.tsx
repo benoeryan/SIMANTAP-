@@ -587,12 +587,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const backup = parseBackupCandidates();
       const cleanStudents = backup.calonSiswaList;
       setStudents(prev => {
-        const map = new Map<string, CalonSiswa>();
-        prev.forEach(s => { if (s && s.id) map.set(s.id, s); });
-        cleanStudents.forEach(s => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
-        return Array.from(map.values());
+        const combined = [...prev, ...cleanStudents];
+        return deduplicateAndMergeCandidates(combined);
       });
-      setRirekishoRecords(prev => ({ ...prev, ...backup.rirekishoMap }));
+      setRirekishoRecords(prev => {
+        const combinedList = [...Object.values(prev), ...Object.values(backup.rirekishoMap)];
+        const dedupped = deduplicateAndMergeCandidates(combinedList);
+        const map: Record<string, CVRirekisho> = {};
+        dedupped.forEach((cv) => {
+          const k = cv.siswaId || cv.id;
+          if (k) map[k] = cv;
+        });
+        return map;
+      });
 
       const totalCandidateCount = Object.keys(backup.rirekishoMap).length || cleanStudents.length;
 

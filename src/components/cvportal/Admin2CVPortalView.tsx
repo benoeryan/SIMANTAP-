@@ -2062,13 +2062,20 @@ export const Admin2CVPortalView: React.FC = () => {
         if (res.success && res.students && res.students.length > 0) {
           console.log(`[Supabase Admin Dashboard] Memuat ${res.students.length} data siswa dari tabel siswa`);
           setStudents((prev) => {
-            const map = new Map<string, any>();
-            prev.forEach((s) => { if (s && s.id) map.set(s.id, s); });
-            res.students.forEach((s: any) => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
-            return Array.from(map.values());
+            const combined = [...prev, ...res.students];
+            return deduplicateAndMergeCandidates(combined);
           });
           if (res.cvMap && Object.keys(res.cvMap).length > 0) {
-            setRirekishoRecords((prev) => ({ ...prev, ...res.cvMap }));
+            setRirekishoRecords((prev) => {
+              const combinedList = [...Object.values(prev), ...Object.values(res.cvMap)];
+              const dedupped = deduplicateAndMergeCandidates(combinedList);
+              const map: Record<string, CVRirekisho> = {};
+              dedupped.forEach((cv) => {
+                const k = cv.siswaId || cv.id;
+                if (k) map[k] = cv;
+              });
+              return map;
+            });
           }
         }
       } catch (err) {
@@ -2087,13 +2094,20 @@ export const Admin2CVPortalView: React.FC = () => {
       const spRes = await fetchSiswaFromSupabase();
       if (spRes.success && spRes.students && spRes.students.length > 0) {
         setStudents((prev) => {
-          const map = new Map<string, any>();
-          prev.forEach((s) => { if (s && s.id) map.set(s.id, s); });
-          spRes.students.forEach((s: any) => { if (s && s.id) map.set(s.id, { ...(map.get(s.id) || {}), ...s }); });
-          return Array.from(map.values());
+          const combined = [...prev, ...spRes.students];
+          return deduplicateAndMergeCandidates(combined);
         });
         if (spRes.cvMap && Object.keys(spRes.cvMap).length > 0) {
-          setRirekishoRecords((prev) => ({ ...prev, ...spRes.cvMap }));
+          setRirekishoRecords((prev) => {
+            const combinedList = [...Object.values(prev), ...Object.values(spRes.cvMap)];
+            const dedupped = deduplicateAndMergeCandidates(combinedList);
+            const map: Record<string, CVRirekisho> = {};
+            dedupped.forEach((cv) => {
+              const k = cv.siswaId || cv.id;
+              if (k) map[k] = cv;
+            });
+            return map;
+          });
         }
       }
       const res = await refreshFirebaseDomain('all');
