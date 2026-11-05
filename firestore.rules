@@ -2,61 +2,89 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Default deny
+    // Helper 1: HANYA AKUN TERDAFTAR (User Harus Autentikasi / Login)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper 2: BATASI JAM OPERASIONAL & HARI KERJA
+    // Hari: Senin (1) s/d Sabtu (6) [Minggu / 7 Tutup]
+    // Jam: 07:00 WIB - 22:00 WIB (Dalam UTC+7 = 00:00 UTC - 15:00 UTC)
+    function isOperationalHours() {
+      let day = request.time.dayOfWeek(); // 1 = Monday, 6 = Saturday, 7 = Sunday
+      let hour = request.time.hours();    // UTC hour
+
+      let isWorkDay = day >= 1 && day <= 6;
+      let isWorkHour = hour >= 0 && hour < 15;
+
+      return isWorkDay && isWorkHour;
+    }
+
+    // Aturan Kombinasi: Hanya Akun Terdaftar & Hanya Pada Jam Operasional
+    function canAccess() {
+      return isAuthenticated() && isOperationalHours();
+    }
+
+    // Deny secara default untuk semua dokumen di luar jam/aturan
     match /{document=**} {
-      allow read, write: if true; // Permissive rule for development mode & applet usage
+      allow read, write: if canAccess();
     }
 
+    // Aturan Spesifik Koleksi Database SIMANTAP
     match /calon_siswa/{id} {
-      allow read, write: if true;
-    }
-
-    match /hasil_kesehatan/{id} {
-      allow read, write: if true;
-    }
-
-    match /asesmen_disc/{id} {
-      allow read, write: if true;
-    }
-
-    match /asesmen_psikotes/{id} {
-      allow read, write: if true;
-    }
-
-    match /dukungan_dana/{id} {
-      allow read, write: if true;
-    }
-
-    match /surat_perjanjian/{id} {
-      allow read, write: if true;
-    }
-
-    match /crm_leads/{id} {
-      allow read, write: if true;
-    }
-
-    match /mitra_organizations/{id} {
-      allow read, write: if true;
-    }
-
-    match /admin_users/{id} {
-      allow read, write: if true;
-    }
-
-    match /pengaturan_master/{id} {
-      allow read, write: if true;
-    }
-
-    match /lowongan_kerja/{id} {
-      allow read, write: if true;
-    }
-
-    match /lamaran_kerja/{id} {
-      allow read, write: if true;
+      allow read, write: if canAccess();
     }
 
     match /candidates/{id} {
-      allow read, write: if true;
+      allow read, write: if canAccess();
+    }
+
+    match /jobs/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /lowongan_kerja/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /lamaran_kerja/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /hasil_kesehatan/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /asesmen_disc/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /asesmen_psikotes/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /aplikasi_dukungan_dana/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /surat_perjanjian/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /admin_users/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /mitra_organizations/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /marketing_leads/{id} {
+      allow read, write: if canAccess();
+    }
+
+    match /pengaturan_master/{id} {
+      allow read, write: if canAccess();
     }
   }
 }
