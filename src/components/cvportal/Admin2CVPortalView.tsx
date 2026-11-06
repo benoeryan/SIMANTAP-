@@ -2054,35 +2054,8 @@ export const Admin2CVPortalView: React.FC = () => {
 
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Auto refresh data siswa dari Supabase DB saat komponen Admin 2 dimuat
+  // Auto refresh data dari Firebase Database saat komponen Admin 2 dimuat
   React.useEffect(() => {
-    async function loadInitialSupabaseStudents() {
-      try {
-        const res = await fetchSiswaFromSupabase();
-        if (res.success && res.students && res.students.length > 0) {
-          console.log(`[Supabase Admin Dashboard] Memuat ${res.students.length} data siswa dari tabel siswa`);
-          setStudents((prev) => {
-            const combined = [...prev, ...res.students];
-            return deduplicateAndMergeCandidates(combined);
-          });
-          if (res.cvMap && Object.keys(res.cvMap).length > 0) {
-            setRirekishoRecords((prev) => {
-              const combinedList = [...Object.values(prev), ...Object.values(res.cvMap)];
-              const dedupped = deduplicateAndMergeCandidates(combinedList);
-              const map: Record<string, CVRirekisho> = {};
-              dedupped.forEach((cv) => {
-                const k = cv.siswaId || cv.id;
-                if (k) map[k] = cv;
-              });
-              return map;
-            });
-          }
-        }
-      } catch (err) {
-        console.warn('Initial Supabase fetch warning:', err);
-      }
-    }
-    loadInitialSupabaseStudents();
     refreshFirebaseDomain('all').catch((err) => {
       console.warn('Initial domain refresh warning:', err);
     });
@@ -2091,37 +2064,25 @@ export const Admin2CVPortalView: React.FC = () => {
   const handleSyncFirebase = async () => {
     setIsSyncing(true);
     try {
-      const spRes = await fetchSiswaFromSupabase();
-      if (spRes.success && spRes.students && spRes.students.length > 0) {
-        setStudents((prev) => {
-          const combined = [...prev, ...spRes.students];
-          return deduplicateAndMergeCandidates(combined);
-        });
-        if (spRes.cvMap && Object.keys(spRes.cvMap).length > 0) {
-          setRirekishoRecords((prev) => {
-            const combinedList = [...Object.values(prev), ...Object.values(spRes.cvMap)];
-            const dedupped = deduplicateAndMergeCandidates(combinedList);
-            const map: Record<string, CVRirekisho> = {};
-            dedupped.forEach((cv) => {
-              const k = cv.siswaId || cv.id;
-              if (k) map[k] = cv;
-            });
-            return map;
-          });
-        }
-      }
       const res = await refreshFirebaseDomain('all');
       setIsSyncing(false);
       const totalCount = rirekishoList.length;
       setToastMessage(
         lang === 'ja'
-          ? `Supabaseデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
-          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari Supabase Database!`
+          ? `Firebaseデータベースと正常に同期しました（${totalCount}件の最新生徒データを更新）`
+          : `Berhasil menyinkronkan & memuat ${totalCount} data siswa terbaru dari Firebase Database!`
       );
     } catch (err: any) {
-      console.error('Error syncing to Supabase:', err);
+      console.error('Error syncing to Firebase:', err);
       setIsSyncing(false);
       setToastMessage(
+        lang === 'ja'
+          ? `同期エラー: ${err?.message || '不明なエラー'}`
+          : `Gagal sinkronisasi: ${err?.message || 'Terjadi kesalahan'}`
+      );
+    }
+    setTimeout(() => setToastMessage(null), 5000);
+  };
         lang === 'ja'
           ? `同期エラー: ${err?.message || '不明なエラー'}`
           : `Gagal sinkronisasi: ${err?.message || 'Terjadi kesalahan'}`
