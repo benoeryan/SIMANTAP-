@@ -2,8 +2,6 @@ import firestoreBackupData from '../../firestore_backup.json';
 import { CVRirekisho, CalonSiswa, CandidateCategory } from '../types';
 import { calculateAgeFromBirthDate } from './candidateUtils';
 import { deduplicateAndMergeCandidates } from './duplicateDetector';
-import { INITIAL_STUDENTS, INITIAL_RIREKISHO } from '../data/seedData';
-import { DRIVE_GRADUATES_LIST } from '../data/googleDriveGraduatesData';
 
 export function unwrapFirestoreValue(val: any): any {
   if (!val || typeof val !== 'object') return val;
@@ -339,43 +337,7 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
     }
   }
 
-  // Combine all candidate datasets: firestore_backup, INITIAL_STUDENTS, and DRIVE_GRADUATES_LIST
-  INITIAL_STUDENTS.forEach((s) => {
-    if (s && s.id) {
-      const existingIdx = calonSiswaList.findIndex(item => item.id === s.id);
-      if (existingIdx >= 0) {
-        calonSiswaList[existingIdx] = { ...s, ...calonSiswaList[existingIdx] };
-      } else {
-        calonSiswaList.push(s);
-      }
-    }
-  });
-
-  DRIVE_GRADUATES_LIST.forEach((g) => {
-    if (g.student && g.student.id) {
-      const existingIdx = calonSiswaList.findIndex(item => item.id === g.student.id);
-      if (existingIdx >= 0) {
-        calonSiswaList[existingIdx] = { ...g.student, ...calonSiswaList[existingIdx] };
-      } else {
-        calonSiswaList.push(g.student);
-      }
-    }
-    if (g.cv && (g.cv.siswaId || g.cv.id)) {
-      const cvKey = g.cv.siswaId || g.cv.id;
-      if (!rirekishoMap[cvKey]) {
-        rirekishoMap[cvKey] = g.cv;
-      }
-    }
-  });
-
-  INITIAL_RIREKISHO.forEach((cv) => {
-    if (cv && (cv.siswaId || cv.id)) {
-      const cvKey = cv.siswaId || cv.id;
-      if (!rirekishoMap[cvKey]) {
-        rirekishoMap[cvKey] = cv;
-      }
-    }
-  });
+  // Only parse from firestore_backup dataset as requested (175 candidates)
 
   // Final name-based global photo propagation pass for any remaining unlinked items
   const nameToPhotoMap = new Map<string, string>();
