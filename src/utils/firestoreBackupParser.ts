@@ -404,8 +404,8 @@ export function parseBackupCandidates(): { rirekishoMap: Record<string, CVRireki
     }
   });
 
-  const cleanCalonSiswaList = calonSiswaList;
-  const cleanRirekishoList = Object.values(rirekishoMap);
+  const cleanCalonSiswaList = deduplicateAndMergeCandidates(calonSiswaList);
+  const cleanRirekishoList = deduplicateAndMergeCandidates(Object.values(rirekishoMap));
 
   const cleanRirekishoMap: Record<string, CVRirekisho> = {};
   cleanRirekishoList.forEach((cv) => {

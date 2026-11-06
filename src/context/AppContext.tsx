@@ -169,25 +169,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [students, setStudents] = useState<CalonSiswa[]>(() => {
-    const studentMap = new Map<string, CalonSiswa>();
     const backup = parseBackupCandidates();
-    backup.calonSiswaList.forEach(s => {
-      if (s && s.id) {
-        studentMap.set(s.id, s);
-      }
-    });
-    INITIAL_STUDENTS.forEach(s => {
-      if (s && s.id && !studentMap.has(s.id)) {
-        studentMap.set(s.id, s);
-      }
-    });
-    DRIVE_GRADUATES_LIST.forEach(g => {
-      if (g.student && g.student.id && !studentMap.has(g.student.id)) {
-        studentMap.set(g.student.id, g.student);
-      }
-    });
-    const rawList = Array.from(studentMap.values());
-    return rawList;
+    return backup.calonSiswaList;
   });
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(() => {
@@ -202,31 +185,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [adminPortalCategoryMode, setAdminPortalCategoryMode] = useState<AdminPortalCategoryMode>('ADMIN_1_IJEF');
 
   const [rirekishoRecords, setRirekishoRecords] = useState<Record<string, CVRirekisho>>(() => {
-    const defaultMap: Record<string, CVRirekisho> = {};
     const backup = parseBackupCandidates();
-    for (const [k, v] of Object.entries(backup.rirekishoMap)) {
-      defaultMap[k] = v;
-    }
-    INITIAL_RIREKISHO.forEach(cv => {
-      const key = cv.siswaId || cv.id;
-      if (key && !defaultMap[key]) {
-        defaultMap[key] = cv;
-      }
-    });
-    DRIVE_GRADUATES_LIST.forEach(g => {
-      if (g.cv && (g.cv.siswaId || g.cv.id)) {
-        const key = g.cv.siswaId || g.cv.id;
-        if (!defaultMap[key]) {
-          defaultMap[key] = g.cv;
-        }
-      }
-    });
-    const rawList = Object.values(defaultMap) as CVRirekisho[];
-    const cleanMap: Record<string, CVRirekisho> = {};
-    rawList.forEach(cv => {
-      cleanMap[cv.siswaId || cv.id] = cv;
-    });
-    return cleanMap;
+    return backup.rirekishoMap;
   });
 
   const [jobPostings, setJobPostings] = useState<JobPosting[]>(() => INITIAL_JOBS);
