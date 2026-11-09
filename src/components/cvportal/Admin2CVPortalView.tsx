@@ -2937,20 +2937,7 @@ export const Admin2CVPortalView: React.FC = () => {
             </div>
           )}
 
-          {/* DASHBOARD STATISTIK SPESIFIK & PERSENTASE DARI TOTAL SISWA (OPSIONAL DI TAB KANDIDAT) */}
-          {showStatusMetricsInKandidat && (
-            <CandidateDashboardStatistics
-              candidates={rirekishoList}
-              selectedStatus={statusFilter}
-              onSelectStatus={(statusKey) => setStatusFilter(statusKey)}
-              selectedGender={genderFilter}
-              onSelectGender={(genderKey) => setGenderFilter(genderKey)}
-              selectedCategory={categoryFilter}
-              onSelectCategory={(catKey) => setCategoryFilter(catKey)}
-              onRefresh={handleSyncFirebase}
-              isRefreshing={isSyncing}
-            />
-          )}
+          {/* DASHBOARD STATISTIK REMOVED AS REQUESTED */}
 
           {/* DASHBOARD JUMLAH KANDIDAT & KLASIFIKASI SEKTOR (LIGHT THEME) */}
           <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm text-slate-800">
@@ -4551,18 +4538,7 @@ export const Admin2CVPortalView: React.FC = () => {
             </div>
           </div>
 
-          {/* DASHBOARD STATISTIK DENGAN PERSENTASE DARI TOTAL SISWA (SESUAI GAMBAR) */}
-          <CandidateDashboardStatistics
-            candidates={rirekishoList}
-            selectedStatus={monitoringSelectedStatus}
-            onSelectStatus={(statusKey) => setMonitoringSelectedStatus(statusKey)}
-            selectedGender={monitoringGenderFilter}
-            onSelectGender={(genderKey) => setMonitoringGenderFilter(genderKey)}
-            selectedCategory={categoryFilter}
-            onSelectCategory={(catKey) => setCategoryFilter(catKey)}
-            onRefresh={handleSyncFirebase}
-            isRefreshing={isSyncing}
-          />
+          {/* DASHBOARD STATISTIK REMOVED AS REQUESTED */}
 
           {/* Ringkasan Pembiayaan & Dana Talang Widget */}
           <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 text-white p-5 rounded-2xl border border-emerald-800/50 shadow-md space-y-3">
