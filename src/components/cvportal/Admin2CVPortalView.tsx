@@ -4504,39 +4504,7 @@ export const Admin2CVPortalView: React.FC = () => {
       {/* TAB MONITORING: DASHBOARD MONITORING STATUS PROGRES */}
       {activeTab === 'monitoring' && (
         <div className="space-y-6 w-full max-w-full overflow-hidden font-sans">
-          {/* Title & Header Banner */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center space-x-2 bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold mb-2">
-                <BarChart3 className="w-3.5 h-3.5 text-amber-600" />
-                <span>{lang === 'ja' ? 'リアルタイム進捗モニタリング' : 'REAL-TIME MONITORING SYSTEM'}</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
-                <span>{lang === 'ja' ? '進捗ステータス・モニタリングダッシュボード' : 'Dashboard Monitoring Status Progres'}</span>
-              </h2>
-              <p className="text-xs text-slate-500 font-medium mt-1 max-w-2xl">
-                {lang === 'ja'
-                  ? '各候補者の最新進捗ステータスを一括監視できます。ステータスカードをクリックして絞り込み、候補者をクリックして進捗編集フォームへ直接移動できます。'
-                  : 'Pantau seluruh kandidat berdasarkan status progres terkini. Klik kartu status untuk menyaring kandidat, atau klik data kandidat untuk langsung menuju form edit progres detail.'}
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-3 self-start md:self-auto">
-              <button
-                type="button"
-                onClick={handleSyncFirebase}
-                disabled={isSyncing}
-                className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-400 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center space-x-2 cursor-pointer"
-              >
-                <CloudUpload className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>
-                  {isSyncing
-                    ? (lang === 'ja' ? '同期中...' : 'Menyingkronkan...')
-                    : (lang === 'ja' ? 'Firebaseと同期' : 'Sinkronkan Ke Firebase')}
-                </span>
-              </button>
-            </div>
-          </div>
+          {/* HEADER BANNER REMOVED AS REQUESTED */}
 
           {/* DASHBOARD STATISTIK REMOVED AS REQUESTED */}
 
