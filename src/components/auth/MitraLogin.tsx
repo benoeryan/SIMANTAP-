@@ -200,7 +200,18 @@ export const MitraLogin: React.FC = () => {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 right-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header Branding & Language Switcher */}
+      {/* Top Header Navigation & Language Switcher */}
+      <div className="absolute top-4 left-4 z-20">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition border border-white/20 shadow-md cursor-pointer"
+        >
+          <ArrowRight className="w-4 h-4 rotate-180 text-amber-400" />
+          <span>{isJa ? '← ホームに戻る' : '← Kembali ke Beranda'}</span>
+        </button>
+      </div>
+
       <div className="absolute top-4 right-4 z-20">
         <LanguageSwitcher />
       </div>
@@ -568,23 +579,34 @@ export const MitraLogin: React.FC = () => {
             )}
 
             {/* Portal Switcher Links */}
-            <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-2 text-center text-[11px]">
-              <button
-                type="button"
-                onClick={() => navigate('/login')}
-                className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-slate-900 font-medium transition cursor-pointer flex items-center justify-center gap-1"
-              >
-                <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
-                <span>{isJa ? '生徒・候補生ポータル' : 'Portal Calon Siswa'}</span>
-              </button>
+            <div className="pt-4 border-t border-slate-200 space-y-2 text-center text-[11px]">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-slate-900 font-medium transition cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
+                  <span>{isJa ? '生徒・候補生ポータル' : 'Portal Calon Siswa'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/admin/login')}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-slate-900 font-medium transition cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-slate-600" />
+                  <span>{isJa ? 'IJEF 管理者ポータル' : 'Portal Admin IJEF'}</span>
+                </button>
+              </div>
 
               <button
                 type="button"
-                onClick={() => navigate('/admin/login')}
-                className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-slate-900 font-medium transition cursor-pointer flex items-center justify-center gap-1"
+                onClick={() => navigate('/')}
+                className="w-full p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-800 font-bold transition cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <KeyRound className="w-3.5 h-3.5 text-slate-600" />
-                <span>{isJa ? 'IJEF 管理者ポータル' : 'Portal Admin IJEF'}</span>
+                <ArrowRight className="w-3.5 h-3.5 rotate-180 text-amber-600" />
+                <span>{isJa ? '← ホームに戻る (Landing Page)' : '← Kembali ke Beranda (Landing Page)'}</span>
               </button>
             </div>
           </div>

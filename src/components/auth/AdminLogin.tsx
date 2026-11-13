@@ -103,6 +103,18 @@ export const AdminLogin: React.FC = () => {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
 
+      {/* Top Left Back Navigation Button */}
+      <div className="absolute top-4 left-4 z-20">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition border border-slate-700 shadow-md cursor-pointer"
+        >
+          <ArrowRight className="w-4 h-4 rotate-180 text-amber-400" />
+          <span>{isJa ? '← ホームに戻る' : '← Kembali ke Beranda'}</span>
+        </button>
+      </div>
+
       {/* Language Switcher Top Right */}
       <div className="absolute top-4 right-4 z-20">
         <LanguageSwitcher variant="pill" />
@@ -515,11 +527,19 @@ export const AdminLogin: React.FC = () => {
             <span>{isJa ? 'Google アカウントでログイン' : 'Masuk dengan Email Google'}</span>
           </button>
 
-          <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] text-slate-500 text-center space-y-1">
+          <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] text-slate-500 text-center space-y-2">
             <p className="font-semibold text-slate-700">Belum memiliki akun?</p>
             <p className="text-slate-600">
               Silakan <button type="button" onClick={() => navigate('/login')} className="text-amber-700 underline font-bold cursor-pointer">Daftar disini</button> atau contact admin untuk didaftarkan.
             </p>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="w-full p-2 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <ArrowRight className="w-3.5 h-3.5 rotate-180 text-amber-700" />
+              <span>{isJa ? '← ホームに戻る (Landing Page)' : '← Kembali ke Beranda (Landing Page)'}</span>
+            </button>
             <p className="font-semibold text-slate-700 pt-1 border-t border-slate-200">{isJa ? 'Firebase 暗号化バックオフィス認証' : 'Firebase Encrypted Back-Office Auth'}</p>
             <p>{isJa ? '全管理者の操作ログは Cloud Firestore 監査証跡に記録されます。' : 'Aktivitas staf dicatat pada Audit Trail Firestore DB.'}</p>
           </div>
