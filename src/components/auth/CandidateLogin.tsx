@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
+import { PublicLandingShowcase } from '../PublicLandingShowcase';
 import {
   GraduationCap,
   Mail,
@@ -17,7 +18,8 @@ import {
   Eye,
   EyeOff,
   HelpCircle,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 
@@ -26,6 +28,7 @@ export const CandidateLogin: React.FC = () => {
   const { students, setSelectedStudentId } = useApp();
   const navigate = useNavigate();
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -106,30 +109,49 @@ export const CandidateLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative min-h-screen">
+      {/* 1. Pre-Login Public Showcase Landing Page */}
+      <PublicLandingShowcase
+        onSelectPortal={(portal) => {
+          if (portal === 'mitra') {
+            navigate('/mitra-login');
+          } else if (portal === 'admin') {
+            navigate('/admin-login');
+          } else {
+            setShowLoginModal(true);
+          }
+        }}
+      />
 
-      {/* Top Header Branding */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-lg text-center z-10">
-        <div className="inline-flex items-center space-x-2 bg-white border border-slate-200 px-4 py-1.5 rounded-full mb-4 shadow-sm">
-          <GraduationCap className="w-5 h-5 text-amber-600" />
-          <span className="text-xs font-extrabold text-slate-800 tracking-wider uppercase">
-            LPK IJEF CORP • PORTAL CANDIDATE
-          </span>
-        </div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-          {isRegister ? 'Pendaftaran Akun Calon Siswa' : 'Login Portal Calon Siswa'}
-        </h1>
-        <p className="mt-2 text-xs text-slate-600 max-w-md mx-auto">
-          Sistem Informasi Manajemen Pelatihan & Magang Kerja Jepang (Tokutei Ginou / Ginou Jisshusei / Gijinkoku).
-        </p>
-      </div>
+      {/* 2. Login / Register Modal Dialog */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 relative animate-in fade-in zoom-in duration-200">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-      {/* Login / Register Box */}
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-xl z-10">
-        <div className="bg-white border border-slate-200 py-8 px-6 shadow-xl rounded-2xl sm:px-10 space-y-6">
+            {/* Top Header Branding */}
+            <div className="text-center">
+              <div className="inline-flex items-center space-x-2 bg-red-50 border border-red-200 px-3.5 py-1 rounded-full mb-3">
+                <GraduationCap className="w-4 h-4 text-red-700" />
+                <span className="text-[11px] font-black text-red-700 tracking-wider uppercase">
+                  LPK IJEF CORP • PORTAL CANDIDATE
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                {isRegister ? 'Pendaftaran Akun Calon Siswa' : 'Login Portal Calon Siswa'}
+              </h1>
+              <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto font-medium">
+                Sistem Informasi Manajemen Pelatihan & Magang Kerja Jepang (Tokutei Ginou / Ginou Jisshusei / Gijinkoku).
+              </p>
+            </div>
+
+            {/* Form & Demo Accounts */}
           {/* Error Alert */}
           {errorMsg && (
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start space-x-2 text-xs text-rose-800">
@@ -525,6 +547,7 @@ export const CandidateLogin: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Forgot Password Modal */}
       <ForgotPasswordModal

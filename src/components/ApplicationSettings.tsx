@@ -12,6 +12,11 @@ import {
   DiscRoleMapping
 } from '../types';
 import {
+  getStoredUiShowcaseConfig,
+  saveUiShowcaseConfig,
+  UiShowcaseConfig
+} from '../data/uiShowcaseConfig';
+import {
   Settings,
   Coins,
   Award,
@@ -85,8 +90,11 @@ export const ApplicationSettings: React.FC = () => {
 
   // Active module tab in sidebar
   const [activeModule, setActiveModule] = useState<
-    'financial' | 'scoring' | 'batches' | 'approvals' | 'rbac'
+    'financial' | 'scoring' | 'batches' | 'approvals' | 'rbac' | 'showcase'
   >('financial');
+
+  // UI Showcase Config State
+  const [showcaseConfig, setShowcaseConfig] = useState<UiShowcaseConfig>(() => getStoredUiShowcaseConfig());
 
   // Local state initialized from masterSettings
   const [financialState, setFinancialState] = useState({
@@ -622,6 +630,18 @@ export const ApplicationSettings: React.FC = () => {
             >
               <Users className="w-4 h-4 shrink-0" />
               <span>{lang === 'ja' ? '5. ロール ＆ 権限管理 (RBAC)' : '5. Role & Hak Akses (RBAC)'}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveModule('showcase')}
+              className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0 lg:shrink ${
+                activeModule === 'showcase'
+                  ? 'bg-red-700 text-white shadow-sm font-black'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <Sparkles className="w-4 h-4 shrink-0 text-red-500" />
+              <span>{lang === 'ja' ? '6. バナー・表示設定' : '6. Pengaturan Tampilan & Banner'}</span>
             </button>
           </div>
 
@@ -1548,6 +1568,164 @@ export const ApplicationSettings: React.FC = () => {
                   </div>
                 </>
               )}
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* MODULE 6: PENGATURAN TAMPILAN & BANNER PROMO */}
+          {/* ========================================================= */}
+          {activeModule === 'showcase' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2.5 bg-red-100 text-red-700 rounded-xl">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-slate-900">
+                        {lang === 'ja' ? 'バナー・表示画像・ショーケース設定' : 'Pengaturan Tampilan & Banner Promo Landing Page'}
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium">
+                        {lang === 'ja'
+                          ? 'ランディングページ、職種写真、およびプロモバナーをコード編集なしで直接管理します。'
+                          : 'Kelola teks banner hero, foto default lowongan, foto sektor industri, dan promo pelatihan langsung dari UI tanpa ubah koding.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveUiShowcaseConfig(showcaseConfig);
+                      showToast('Pengaturan Tampilan & Banner berhasil disimpan!');
+                    }}
+                    className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{lang === 'ja' ? '表示設定を保存' : 'Simpan Tampilan & Banner'}</span>
+                  </button>
+                </div>
+
+                {/* 1. HERO BANNER TEXTS */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase text-red-700 tracking-wider flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    <span>1. Teks Hero Banner Pre-Login</span>
+                  </h4>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Tagline Atas Banner</label>
+                      <input
+                        type="text"
+                        value={showcaseConfig.heroTagline}
+                        onChange={(e) => setShowcaseConfig({ ...showcaseConfig, heroTagline: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-900"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Judul Utama Hero (H1)</label>
+                      <input
+                        type="text"
+                        value={showcaseConfig.heroTitle}
+                        onChange={(e) => setShowcaseConfig({ ...showcaseConfig, heroTitle: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-900"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Sub-Judul Hero</label>
+                      <textarea
+                        rows={2}
+                        value={showcaseConfig.heroSubtitle}
+                        onChange={(e) => setShowcaseConfig({ ...showcaseConfig, heroSubtitle: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-900"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. DEFAULT PHOTOS FOR JOBS & CANDIDATES */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <h4 className="text-xs font-black uppercase text-red-700 tracking-wider flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    <span>2. Foto Default Standar (Fallback Images)</span>
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                      <label className="block text-xs font-bold text-slate-800">Foto Default Job Posting (16:9 Cover)</label>
+                      <input
+                        type="text"
+                        value={showcaseConfig.defaultJobPhotoUrl}
+                        onChange={(e) => setShowcaseConfig({ ...showcaseConfig, defaultJobPhotoUrl: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-700"
+                      />
+                      <div className="h-32 rounded-xl overflow-hidden bg-slate-200 border border-slate-300 relative">
+                        <img src={showcaseConfig.defaultJobPhotoUrl} alt="Default Job" className="w-full h-full object-cover" />
+                        <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded">Preview Job Cover</span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                      <label className="block text-xs font-bold text-slate-800">Foto Default PasFoto Kandidat</label>
+                      <input
+                        type="text"
+                        value={showcaseConfig.defaultCandidatePhotoUrl}
+                        onChange={(e) => setShowcaseConfig({ ...showcaseConfig, defaultCandidatePhotoUrl: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-700"
+                      />
+                      <div className="h-32 rounded-xl overflow-hidden bg-slate-200 border border-slate-300 relative flex items-center justify-center">
+                        <img src={showcaseConfig.defaultCandidatePhotoUrl} alt="Default Candidate" className="w-24 h-24 object-cover rounded-full border-2 border-red-600" />
+                        <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded">Preview PasFoto</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. SECTOR COVERS MANAGER */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <h4 className="text-xs font-black uppercase text-red-700 tracking-wider flex items-center gap-2">
+                    <Layers className="w-4 h-4" />
+                    <span>3. Foto Cover Sektor Industri ("Industri Pilihanmu")</span>
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {showcaseConfig.sectorCovers.map((sec, idx) => (
+                      <div key={sec.id} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                        <div className="h-24 rounded-xl overflow-hidden relative">
+                          <img src={sec.imageUrl} alt={sec.name} className="w-full h-full object-cover" />
+                          <span className="absolute top-1.5 right-1.5 bg-red-700 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">{sec.jobCount} Job</span>
+                        </div>
+                        <input
+                          type="text"
+                          value={sec.name}
+                          onChange={(e) => {
+                            const updated = [...showcaseConfig.sectorCovers];
+                            updated[idx].name = e.target.value;
+                            setShowcaseConfig({ ...showcaseConfig, sectorCovers: updated });
+                          }}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-900"
+                        />
+                        <input
+                          type="text"
+                          value={sec.imageUrl}
+                          onChange={(e) => {
+                            const updated = [...showcaseConfig.sectorCovers];
+                            updated[idx].imageUrl = e.target.value;
+                            setShowcaseConfig({ ...showcaseConfig, sectorCovers: updated });
+                          }}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] font-mono text-slate-600"
+                          placeholder="Image URL"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
             </div>
           )}
         </div>

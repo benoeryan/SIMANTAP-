@@ -375,6 +375,26 @@ export const MitraJobFormModal: React.FC<MitraJobFormModalProps> = ({
 
               <div className="sm:col-span-2 lg:col-span-5">
                 <label className="block text-[11px] text-slate-700 font-bold mb-1 uppercase tracking-wider">
+                  {lang === 'ja' ? '求人カバー写真のURL / 画像アップロード' : 'URL / Upload Foto Cover Lowongan (Photo-First Card)'}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={jobForm.imageUrl || jobForm.photoUrl || ''}
+                    onChange={(e) => setJobForm({ ...jobForm, imageUrl: e.target.value, photoUrl: e.target.value })}
+                    placeholder="https://images.unsplash.com/photo-... (Foto Suasana Kerja / Perusahaan / Asrama)"
+                    className="flex-1 bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-900 font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                  />
+                  {(jobForm.imageUrl || jobForm.photoUrl) && (
+                    <div className="w-16 h-11 rounded-xl overflow-hidden border border-slate-300 bg-slate-100 shrink-0">
+                      <img src={jobForm.imageUrl || jobForm.photoUrl} alt="Cover Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="sm:col-span-2 lg:col-span-5">
+                <label className="block text-[11px] text-slate-700 font-bold mb-1 uppercase tracking-wider">
                   {t.jobTitle} <span className="text-rose-500">*</span>
                 </label>
                 <input

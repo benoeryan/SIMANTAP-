@@ -364,6 +364,8 @@ export interface JobPosting {
   kuotaSiswa: number;
   statusJob: 'Aktif' | 'Tutup' | 'Lokal/Domestik (Jepang)' | string;
   statusAktif?: boolean;
+  imageUrl?: string;
+  photoUrl?: string;
 }
 
 export interface JobApplication {
